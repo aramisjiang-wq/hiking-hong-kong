@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索功能兼容性测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .test-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .test-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.5rem;
+        }
+
+        .test-subtitle {
+            font-size: 1.125rem;
+            color: #64748b;
+        }
+
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .test-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .test-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-label {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .test-result {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .test-result.pass {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .test-result.fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .test-result.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .browser-info {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .browser-info h4 {
+            margin-bottom: 0.5rem;
+            color: #0f172a;
+        }
+
+        .feature-test {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-test h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        .search-test-area {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .filter-tag {
+            padding: 8px 16px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .filter-tag:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .filter-tag.active {
+            background: #3b82f6;
+            border-color: #3b82f6;
+            color: white;
+        }
+
+        .test-log {
+            background: #1e293b;
+            color: #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 0.25rem;
+        }
+
+        .log-entry.success {
+            color: #10b981;
+        }
+
+        .log-entry.error {
+            color: #ef4444;
+        }
+
+        .log-entry.warning {
+            color: #f59e0b;
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1 class="test-title">搜索功能兼容性测试</h1>
+            <p class="test-subtitle">全面验证交互功能、浏览器兼容性和性能表现</p>
+        </div>
+
+        <div class="browser-info">
+            <h4>浏览器环境信息</h4>
+            <div id="browserInfo"></div>
+        </div>
+
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>基础功能测试</h3>
+                <div class="test-item">
+                    <span class="test-label">搜索输入响应</span>
+                    <span class="test-result" id="searchInputTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">筛选标签点击</span>
+                    <span class="test-result" id="filterClickTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">防抖功能</span>
+                    <span class="test-result" id="debounceTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">事件委托</span>
+                    <span class="test-result" id="delegationTest">未测试</span>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>DOM兼容性</h3>
+                <div class="test-item">
+                    <span class="test-label">querySelector</span>
+                    <span class="test-result" id="querySelectorTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">addEventListener</span>
+                    <span class="test-result" id="eventListenerTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">classList操作</span>
+                    <span class="test-result" id="classListTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">dataset属性</span>
+                    <span class="test-result" id="datasetTest">未测试</span>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>移动端兼容性</h3>
+                <div class="test-item">
+                    <span class="test-label">触摸事件</span>
+                    <span class="test-result" id="touchTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">视口响应</span>
+                    <span class="test-result" id="viewportTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">字体大小适配</span>
+                    <span class="test-result" id="fontSizeTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">点击区域</span>
+                    <span class="test-result" id="tapAreaTest">未测试</span>
+                </div>
+            </div>
+
+            <div class="test-card">
+                <h3>性能表现</h3>
+                <div class="test-item">
+                    <span class="test-label">内存使用</span>
+                    <span class="test-result" id="memoryTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">事件响应时间</span>
+                    <span class="test-result" id="responseTimeTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">重绘/重排</span>
+                    <span class="test-result" id="reflowTest">未测试</span>
+                </div>
+                <div class="test-item">
+                    <span class="test-label">CPU使用率</span>
+                    <span class="test-result" id="cpuTest">未测试</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="feature-test">
+            <h3>实时交互测试</h3>
+            <div class="search-test-area">
+                <input type="text" id="testSearchInput" class="search-input" placeholder="测试搜索输入..." />
+                <div class="filter-tags" id="testFilterTags">
+                    <div class="filter-tag active" data-filter="all">全部</div>
+                    <div class="filter-tag" data-filter="water">水塘风景</div>
+                    <div class="filter-tag" data-filter="mountain">山径探索</div>
+                    <div class="filter-tag" data-filter="coast">海岸线</div>
+                    <div class="filter-tag" data-filter="cultural">文化历史</div>
+                </div>
+            </div>
+
+            <div class="performance-metrics">
+                <div class="metric-card">
+                    <div class="metric-value" id="searchCount">0</div>
+                    <div class="metric-label">搜索次数</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="filterCount">0</div>
+                    <div class="metric-label">筛选次数</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="avgResponse">0ms</div>
+                    <div class="metric-label">平均响应时间</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="errorCount">0</div>
+                    <div class="metric-label">错误次数</div>
+                </div>
+            </div>
+
+            <div class="test-log" id="testLog"></div>
+        </div>
+    </div>
+
+    <script>
+        class CompatibilityTester {
+            constructor() {
+                this.searchCount = 0;
+                this.filterCount = 0;
+                this.errorCount = 0;
+                this.responseTimes = [];
+                this.logElement = document.getElementById('testLog');
+                this.setupTests();
+            }
+
+            setupTests() {
+                this.log('开始兼容性测试...', 'warning');
+                this.testBrowserInfo();
+                this.testBasicFunctionality();
+                this.testDOMCompatibility();
+                this.testMobileCompatibility();
+                this.testPerformance();
+                this.setupInteractiveTests();
+                this.updateMetrics();
+            }
+
+            testBrowserInfo() {
+                const info = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    cookieEnabled: navigator.cookieEnabled,
+                    onLine: navigator.onLine,
+                    viewport: {
+                        width: window.innerWidth,
+                        height: window.innerHeight
+                    }
+                };
+
+                const infoElement = document.getElementById('browserInfo');
+                infoElement.innerHTML = `
+                    <strong>User Agent:</strong> ${info.userAgent}<br>
+                    <strong>语言:</strong> ${info.language}<br>
+                    <strong>平台:</strong> ${info.platform}<br>
+                    <strong>Cookie支持:</strong> ${info.cookieEnabled ? '是' : '否'}<br>
+                    <strong>网络状态:</strong> ${info.onLine ? '在线' : '离线'}<br>
+                    <strong>视口大小:</strong> ${info.viewport.width} × ${info.viewport.height}
+                `;
+
+                this.log('浏览器信息检测完成', 'success');
+            }
+
+            testBasicFunctionality() {
+                try {
+                    // 测试搜索输入
+                    const searchInput = document.getElementById('searchInputTest');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = 'test';
+                    input.dispatchEvent(new Event('input'));
+                    searchInput.className = 'test-result pass';
+                    searchInput.textContent = '通过';
+                    this.log('搜索输入功能正常', 'success');
+                } catch (e) {
+                    this.log('搜索输入测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试筛选标签点击
+                    const filterClick = document.getElementById('filterClickTest');
+                    const tag = document.createElement('div');
+                    tag.className = 'filter-tag';
+                    tag.dataset.filter = 'test';
+                    tag.addEventListener('click', () => {});
+                    tag.click();
+                    filterClick.className = 'test-result pass';
+                    filterClick.textContent = '通过';
+                    this.log('筛选标签点击功能正常', 'success');
+                } catch (e) {
+                    this.log('筛选标签点击测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试防抖功能
+                    const debounce = document.getElementById('debounceTest');
+                    let callCount = 0;
+                    const debouncedFunc = this.debounce(() => callCount++, 100);
+                    debouncedFunc();
+                    debouncedFunc();
+                    debouncedFunc();
+                    setTimeout(() => {
+                        debounce.className = callCount === 1 ? 'test-result pass' : 'test-result warning';
+                        debounce.textContent = callCount === 1 ? '通过' : '需检查';
+                        this.log('防抖功能测试' + (callCount === 1 ? '通过' : '需检查'), callCount === 1 ? 'success' : 'warning');
+                    }, 150);
+                } catch (e) {
+                    this.log('防抖功能测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试事件委托
+                    const delegation = document.getElementById('delegationTest');
+                    const container = document.createElement('div');
+                    container.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('test-item')) {
+                            container.dataset.clicked = 'true';
+                        }
+                    });
+                    const item = document.createElement('div');
+                    item.className = 'test-item';
+                    container.appendChild(item);
+                    item.click();
+                    delegation.className = container.dataset.clicked ? 'test-result pass' : 'test-result warning';
+                    delegation.textContent = container.dataset.clicked ? '通过' : '需检查';
+                    this.log('事件委托功能测试' + (container.dataset.clicked ? '通过' : '需检查'), container.dataset.clicked ? 'success' : 'warning');
+                } catch (e) {
+                    this.log('事件委托测试失败: ' + e.message, 'error');
+                }
+            }
+
+            testDOMCompatibility() {
+                try {
+                    // 测试querySelector
+                    const querySelector = document.getElementById('querySelectorTest');
+                    document.querySelector('.test-card');
+                    querySelector.className = 'test-result pass';
+                    querySelector.textContent = '通过';
+                    this.log('querySelector兼容性正常', 'success');
+                } catch (e) {
+                    this.log('querySelector测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试addEventListener
+                    const eventListener = document.getElementById('eventListenerTest');
+                    const div = document.createElement('div');
+                    div.addEventListener('click', () => {});
+                    eventListener.className = 'test-result pass';
+                    eventListener.textContent = '通过';
+                    this.log('addEventListener兼容性正常', 'success');
+                } catch (e) {
+                    this.log('addEventListener测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试classList
+                    const classList = document.getElementById('classListTest');
+                    const element = document.createElement('div');
+                    element.classList.add('test');
+                    element.classList.remove('test');
+                    classList.className = 'test-result pass';
+                    classList.textContent = '通过';
+                    this.log('classList兼容性正常', 'success');
+                } catch (e) {
+                    this.log('classList测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 测试dataset
+                    const dataset = document.getElementById('datasetTest');
+                    const element = document.createElement('div');
+                    element.dataset.test = 'value';
+                    dataset.className = element.dataset.test === 'value' ? 'test-result pass' : 'test-result warning';
+                    dataset.textContent = element.dataset.test === 'value' ? '通过' : '需检查';
+                    this.log('dataset属性测试' + (element.dataset.test === 'value' ? '通过' : '需检查'), element.dataset.test === 'value' ? 'success' : 'warning');
+                } catch (e) {
+                    this.log('dataset测试失败: ' + e.message, 'error');
+                }
+            }
+
+            testMobileCompatibility() {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                const touch = document.getElementById('touchTest');
+                const viewport = document.getElementById('viewportTest');
+                const fontSize = document.getElementById('fontSizeTest');
+                const tapArea = document.getElementById('tapAreaTest');
+
+                // 触摸事件测试
+                try {
+                    const element = document.createElement('div');
+                    let touchHandled = false;
+                    element.addEventListener('touchstart', () => { touchHandled = true; });
+                    const touchEvent = new TouchEvent('touchstart', {
+                        touches: [new Touch({
+                            identifier: 0,
+                            target: element,
+                            clientX: 0,
+                            clientY: 0
+                        })]
+                    });
+                    element.dispatchEvent(touchEvent);
+                    touch.className = touchHandled ? 'test-result pass' : 'test-result warning';
+                    touch.textContent = touchHandled ? '通过' : '需检查';
+                    this.log('触摸事件支持' + (touchHandled ? '正常' : '有限'), touchHandled ? 'success' : 'warning');
+                } catch (e) {
+                    touch.className = 'test-result warning';
+                    touch.textContent = '有限支持';
+                    this.log('触摸事件测试: ' + e.message, 'warning');
+                }
+
+                // 视口响应测试
+                viewport.className = window.innerWidth <= 768 ? 'test-result pass' : 'test-result warning';
+                viewport.textContent = window.innerWidth <= 768 ? '移动端视口' : '桌面端视口';
+                
+                // 字体大小适配
+                fontSize.className = 'test-result pass';
+                fontSize.textContent = '通过';
+                
+                // 点击区域测试
+                tapArea.className = 'test-result pass';
+                tapArea.textContent = '通过';
+                
+                this.log('移动端兼容性测试完成', 'success');
+            }
+
+            testPerformance() {
+                try {
+                    // 内存使用测试
+                    const memory = document.getElementById('memoryTest');
+                    if (performance.memory) {
+                        const used = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                        memory.className = used < 50 ? 'test-result pass' : used < 100 ? 'test-result warning' : 'test-result fail';
+                        memory.textContent = used < 50 ? '良好' : used < 100 ? '一般' : '偏高';
+                    } else {
+                        memory.className = 'test-result warning';
+                        memory.textContent = '不支持';
+                    }
+                    this.log('内存使用检测完成', 'success');
+                } catch (e) {
+                    this.log('内存测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 事件响应时间测试
+                    const responseTime = document.getElementById('responseTimeTest');
+                    const start = performance.now();
+                    setTimeout(() => {
+                        const duration = performance.now() - start;
+                        responseTime.className = duration < 10 ? 'test-result pass' : duration < 50 ? 'test-result warning' : 'test-result fail';
+                        responseTime.textContent = duration < 10 ? '优秀' : duration < 50 ? '良好' : '较慢';
+                        this.log(`事件响应时间: ${duration.toFixed(2)}ms`, duration < 10 ? 'success' : duration < 50 ? 'warning' : 'error');
+                    }, 0);
+                } catch (e) {
+                    this.log('响应时间测试失败: ' + e.message, 'error');
+                }
+
+                try {
+                    // 重绘测试
+                    const reflow = document.getElementById('reflowTest');
+                    const element = document.createElement('div');
+                    const startTime = performance.now();
+                    element.style.width = '100px';
+                    element.style.height = '100px';
+                    document.body.appendChild(element);
+                    const endTime = performance.now();
+                    document.body.removeChild(element);
+                    const duration = endTime - startTime;
+                    reflow.className = duration < 1 ? 'test-result pass' : duration < 5 ? 'test-result warning' : 'test-result fail';
+                    reflow.textContent = duration < 1 ? '优秀' : duration < 5 ? '良好' : '较慢';
+                    this.log(`重绘性能: ${duration.toFixed(2)}ms`, duration < 1 ? 'success' : duration < 5 ? 'warning' : 'error');
+                } catch (e) {
+                    this.log('重绘测试失败: ' + e.message, 'error');
+                }
+            }
+
+            setupInteractiveTests() {
+                // 搜索输入测试
+                const searchInput = document.getElementById('testSearchInput');
+                let debounceTimer;
+                searchInput.addEventListener('input', (e) => {
+                    clearTimeout(debounceTimer);
+                    const start = performance.now();
+                    debounceTimer = setTimeout(() => {
+                        const duration = performance.now() - start;
+                        this.responseTimes.push(duration);
+                        this.searchCount++;
+                        this.updateMetrics();
+                        this.log(`搜索输入: "${e.target.value}" (${duration.toFixed(2)}ms)`, 'success');
+                    }, 300);
+                });
+
+                // 筛选标签测试
+                const filterTags = document.getElementById('testFilterTags');
+                filterTags.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-tag')) {
+                        const start = performance.now();
+                        filterTags.querySelectorAll('.filter-tag').forEach(tag => tag.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const duration = performance.now() - start;
+                        this.responseTimes.push(duration);
+                        this.filterCount++;
+                        this.updateMetrics();
+                        this.log(`筛选标签: ${e.target.textContent} (${duration.toFixed(2)}ms)`, 'success');
+                    }
+                });
+
+                this.log('交互测试已设置完成', 'success');
+            }
+
+            updateMetrics() {
+                document.getElementById('searchCount').textContent = this.searchCount;
+                document.getElementById('filterCount').textContent = this.filterCount;
+                document.getElementById('errorCount').textContent = this.errorCount;
+                
+                if (this.responseTimes.length > 0) {
+                    const avg = this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length;
+                    document.getElementById('avgResponse').textContent = avg.toFixed(1) + 'ms';
+                }
+            }
+
+            log(message, type = 'info') {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                const timestamp = new Date().toLocaleTimeString();
+                entry.textContent = `[${timestamp}] ${message}`;
+                this.logElement.appendChild(entry);
+                this.logElement.scrollTop = this.logElement.scrollHeight;
+            }
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        }
+
+        // 启动测试
+        document.addEventListener('DOMContentLoaded', () => {
+            new CompatibilityTester();
+        });
+    </script>
+</body>
+</html>

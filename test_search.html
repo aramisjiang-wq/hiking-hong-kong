@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索功能测试</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .search-box { 
+            margin: 10px 0; 
+        }
+        input[type="text"] { 
+            width: 300px; 
+            padding: 8px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+        }
+        .filter-tags { 
+            margin: 10px 0; 
+        }
+        .filter-tag { 
+            display: inline-block; 
+            padding: 5px 10px; 
+            margin: 2px; 
+            background: #eee; 
+            border-radius: 15px; 
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-tag:hover { 
+            background: #ddd; 
+        }
+        .filter-tag.active { 
+            background: #007bff; 
+            color: white; 
+        }
+        .results { 
+            margin-top: 20px; 
+            padding: 10px; 
+            background: #f8f9fa; 
+            border-radius: 4px;
+        }
+        .result-item { 
+            padding: 8px; 
+            margin: 4px 0; 
+            background: white; 
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+        .debug-info {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>徒步路线搜索功能测试</h1>
+    
+    <div class="test-section">
+        <h3>1. 搜索框测试</h3>
+        <div class="search-box">
+            <input type="text" id="testSearch" placeholder="搜索路线名称或地点...">
+            <button onclick="clearSearch()">清空</button>
+        </div>
+        <div id="searchResults" class="results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>2. 筛选标签测试</h3>
+        <div class="filter-tags" id="testFilterTags">
+            <div class="filter-tag active" data-filter="all">全部</div>
+            <div class="filter-tag" data-filter="water">水塘风景</div>
+            <div class="filter-tag" data-filter="mountain">山峰远景</div>
+            <div class="filter-tag" data-filter="coast">海岸徒步</div>
+            <div class="filter-tag" data-filter="cultural">文化历史</div>
+        </div>
+        <div id="filterResults" class="results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. 调试信息</h3>
+        <div id="debugInfo" class="debug-info"></div>
+    </div>
+
+    <script>
+        // 模拟数据
+        const testRoutes = [
+            { name: "山頂環迴步行徑", location: "香港島", features: "平緩路線，適合全家郊遊，可以欣賞維多利亞港美景" },
+            { name: "大嶼山昂坪棧道", location: "大嶼山", features: "中等難度，需要一定體力，途經天壇大佛和文化村" },
+            { name: "西貢碼頭海濱長廊", location: "西貢", features: "平緩路線，沿海而建，適合散步和觀景" },
+            { name: "獅子山國家公園健行步道", location: "新界", features: "挑戰路線，需要良好體力，山頂景色壯麗" },
+            { name: "龍脊徒步道", location: "香港島東南部", features: "中等難度，途經美麗的海崖和山峰" }
+        ];
+
+        const RouteCategories = {
+            water: ['水塘', '水庫', '瀑布', '濕地', '湖泊', '小島', '千島湖', '河背', '紅樹林'],
+            mountain: ['山', '峰', '頂', '高', '陡', '遠景', '山頂', '山腰', '山峰'],
+            coast: ['海', '岸', '海灣', '灣', '海濱', '半島', '海岸', '海邊', '海洋'],
+            cultural: ['歷史', '古道', '村落', '客家', '文化', '文物', '古', '遺跡', '燈塔', '民俗']
+        };
+
+        let currentFilter = 'all';
+        let searchQuery = '';
+
+        // 搜索匹配函数
+        function matchesSearch(route, query) {
+            if (!query) return true;
+            const searchText = query.toLowerCase();
+            return route.name.toLowerCase().includes(searchText) ||
+                   route.location.toLowerCase().includes(searchText) ||
+                   route.features.toLowerCase().includes(searchText);
+        }
+
+        // 分类匹配函数
+        function matchesCategory(route, category) {
+            if (category === 'all') return true;
+            
+            const keywords = RouteCategories[category] || [];
+            const routeText = (route.name + route.features + route.location).toLowerCase();
+            
+            return keywords.some(keyword => routeText.includes(keyword.toLowerCase()));
+        }
+
+        // 应用筛选
+        function applyFilters() {
+            let filtered = testRoutes.filter(route => {
+                const matchesSearchResult = matchesSearch(route, searchQuery);
+                const matchesCategoryResult = matchesCategory(route, currentFilter);
+                return matchesSearchResult && matchesCategoryResult;
+            });
+
+            displayResults(filtered);
+            updateDebugInfo();
+        }
+
+        // 显示结果
+        function displayResults(routes) {
+            const searchResults = document.getElementById('searchResults');
+            const filterResults = document.getElementById('filterResults');
+            
+            const html = routes.map(route => `
+                <div class="result-item">
+                    <strong>${route.name}</strong><br>
+                    <small>${route.location}</small><br>
+                    <span>${route.features}</span>
+                </div>
+            `).join('');
+            
+            searchResults.innerHTML = `<h4>搜索结果 (${routes.length} 条)</h4>${html}`;
+            filterResults.innerHTML = `<h4>筛选结果 (${routes.length} 条)</h4>${html}`;
+        }
+
+        // 更新调试信息
+        function updateDebugInfo() {
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.innerHTML = `
+                当前搜索查询: "${searchQuery}"<br>
+                当前筛选类别: "${currentFilter}"<br>
+                搜索函数工作状态: ${typeof matchesSearch === 'function' ? '正常' : '异常'}<br>
+                筛选函数工作状态: ${typeof matchesCategory === 'function' ? '正常' : '异常'}<br>
+                数据总数: ${testRoutes.length}
+            `;
+        }
+
+        // 清空搜索
+        function clearSearch() {
+            document.getElementById('testSearch').value = '';
+            searchQuery = '';
+            applyFilters();
+        }
+
+        // 初始化事件监听
+        document.addEventListener('DOMContentLoaded', function() {
+            // 搜索框事件
+            const searchInput = document.getElementById('testSearch');
+            searchInput.addEventListener('input', function(e) {
+                searchQuery = e.target.value;
+                console.log('搜索查询变化:', searchQuery);
+                applyFilters();
+            });
+
+            // 筛选标签事件
+            const filterTags = document.getElementById('testFilterTags');
+            filterTags.addEventListener('click', function(e) {
+                if (e.target.classList.contains('filter-tag')) {
+                    // 更新活跃状态
+                    filterTags.querySelectorAll('.filter-tag').forEach(tag => {
+                        tag.classList.remove('active');
+                    });
+                    e.target.classList.add('active');
+
+                    // 应用筛选
+                    currentFilter = e.target.dataset.filter;
+                    console.log('筛选类别变化:', currentFilter);
+                    applyFilters();
+                }
+            });
+
+            // 初始化显示
+            applyFilters();
+        });
+    </script>
+</body>
+</html>

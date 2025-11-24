@@ -4,6 +4,7 @@ const AppState = {
     filteredRoutes: [],
     markers: new Map(),
     currentFilter: 'all',
+    currentDifficultyFilter: 'all',
     searchQuery: '',
     activeRoute: null,
     totalViews: 0,
@@ -64,7 +65,10 @@ const DOM = {
     locationStatus: null,
     locationText: null,
     routesTrendChart: null,
-    difficultyChart: null
+    difficultyChart: null,
+    // 筛选相关元素
+    filterSections: null,
+    difficultyFilterTags: null
 };
 
 // 香港特色地图瓦片服务配置（网络优先，离线备用）
@@ -114,6 +118,14 @@ const Utils = {
         const routeText = (route.name + route.features + route.location).toLowerCase();
         
         return keywords.some(keyword => routeText.includes(keyword.toLowerCase()));
+    },
+
+    // 难度匹配
+    matchesDifficulty: (route, difficulty) => {
+        if (difficulty === 'all') return true;
+        
+        const routeDifficulty = Utils.getDifficulty(route);
+        return routeDifficulty.level === difficulty;
     },
 
     // 防抖函数
@@ -598,11 +610,11 @@ class MapManager {
             className: 'custom-marker',
             html: `
                 <div class="marker-pin">
-                    <i class="fas fa-hiking marker-icon" style="color: white; font-size: 14px;"></i>
+                    <i class="fas fa-hiking marker-icon" style="color: white; font-size: 18px;"></i>
                 </div>
             `,
-            iconSize: [30, 30],
-            iconAnchor: [15, 30]
+            iconSize: [40, 40],
+            iconAnchor: [20, 40]
         });
         this.startIcon = L.divIcon({
             className: 'start-end-marker start-marker',
@@ -1238,35 +1250,7 @@ class MapManager {
                 const polyline = L.polyline(route.routePath, pathOptions).addTo(this.map);
                 this.routePaths.set(route.id, polyline);
 
-                // 添加起点和终点标记
-                if (route.routePath.length > 0) {
-                    const startPoint = route.routePath[0]; // 起点
-                    const endPoint = route.routePath[route.routePath.length - 1]; // 终点
 
-                    // 创建起点标记
-                    const startMarker = L.marker(startPoint, { icon: this.startIcon }).addTo(this.map);
-                    startMarker.bindPopup(`
-                        <div style="font-family: 'Noto Sans SC', sans-serif; padding: 4px 8px;">
-                            <strong style="color: #059669;">🚀 起点</strong><br>
-                            <span style="color: #6B7280; font-size: 12px;">${route.name}</span>
-                        </div>
-                    `);
-
-                    // 创建终点标记
-                    const endMarker = L.marker(endPoint, { icon: this.endIcon }).addTo(this.map);
-                    endMarker.bindPopup(`
-                        <div style="font-family: 'Noto Sans SC', sans-serif; padding: 4px 8px;">
-                            <strong style="color: #DC2626;">🏁 终点</strong><br>
-                            <span style="color: #6B7280; font-size: 12px;">${route.name}</span>
-                        </div>
-                    `);
-
-                    // 存储起点终点标记
-                    if (!this.startEndMarkers.has(route.id)) {
-                        this.startEndMarkers.set(route.id, []);
-                    }
-                    this.startEndMarkers.get(route.id).push(startMarker, endMarker);
-                }
             }
             const difficulty = Utils.getDifficulty(route);
             const rating = Utils.generateRating();
@@ -1351,7 +1335,8 @@ class RouteManager {
         let filtered = this.routes.filter(route => {
             const matchesSearch = Utils.matchesSearch(route, AppState.searchQuery);
             const matchesCategory = Utils.matchesCategory(route, AppState.currentFilter);
-            return matchesSearch && matchesCategory;
+            const matchesDifficulty = Utils.matchesDifficulty(route, AppState.currentDifficultyFilter);
+            return matchesSearch && matchesCategory && matchesDifficulty;
         });
 
         AppState.filteredRoutes = filtered;
@@ -1382,32 +1367,26 @@ class RouteManager {
         const routeItem = document.createElement('div');
         routeItem.className = 'route-item';
         routeItem.dataset.routeId = route.id;
+        routeItem.dataset.difficulty = route.difficulty || '简单';
 
         const rating = Utils.generateRating();
         const difficulty = Utils.getDifficulty(route);
+        
+        // 根据难度等级设置CSS类名
+        let difficultyClass = 'easy';
+        if (difficulty.level === '中等') difficultyClass = 'medium';
+        if (difficulty.level === '困难') difficultyClass = 'hard';
 
         routeItem.innerHTML = `
             <div class="route-header">
-                <h3 class="route-title">${route.name}</h3>
+                <h3 class="route-title"><span class="route-number">${route.id.toString().padStart(2, '0')}.</span> ${route.name}</h3>
                 <div class="route-rating">
                     ${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}
                 </div>
             </div>
-            <div class="route-location">
-                <i class="fas fa-map-marker-alt"></i>
-                <span>${route.location}</span>
-            </div>
-            <div class="route-features">
-                ${Utils.truncateText(route.features, 100)}
-            </div>
             <div class="route-meta">
                 <div class="route-meta-item">
-                    <i class="fas fa-signal" style="color: ${difficulty.color};"></i>
-                    <span>${difficulty.level}</span>
-                </div>
-                <div class="route-meta-item">
-                    <i class="fas fa-hiking"></i>
-                    <span>徒步路线</span>
+                    <span class="difficulty-tag ${difficultyClass}">${difficulty.level}</span>
                 </div>
             </div>
         `;
@@ -1627,6 +1606,57 @@ class HikingApp {
             }
         });
 
+        // 难度筛选标签事件监听
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('difficulty-tag')) {
+                // 如果点击的是难度标签，获取其对应的筛选标签
+                const difficulty = e.target.textContent.trim();
+                const filterTag = document.querySelector(`[data-difficulty="${difficulty}"]`);
+                
+                if (filterTag) {
+                    // 更新活跃状态
+                    document.querySelectorAll('.filter-tag').forEach(tag => {
+                        tag.classList.remove('active');
+                    });
+                    filterTag.classList.add('active');
+
+                    // 应用筛选
+                    AppState.currentDifficultyFilter = difficulty;
+                    this.routeManager.applyFilters();
+                    this.updateSearchStats();
+                }
+            }
+        });
+
+        // 筛选标签事件监听（处理类型和难度筛选）
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('filter-tag')) {
+                // 更新活跃状态
+                document.querySelectorAll('.filter-tag').forEach(tag => {
+                    tag.classList.remove('active');
+                });
+                e.target.classList.add('active');
+
+                // 添加波纹效果
+                this.createRippleEffect(e.target, e);
+
+                // 判断是类型筛选还是难度筛选
+                const filterType = e.target.closest('.filter-section').querySelector('.filter-title').textContent;
+                
+                if (filterType === '类型筛选') {
+                    AppState.currentFilter = e.target.dataset.filter;
+                } else if (filterType === '难度筛选') {
+                    AppState.currentDifficultyFilter = e.target.dataset.difficulty;
+                }
+
+                this.routeManager.applyFilters();
+                this.updateSearchStats();
+                
+                // 更新筛选标签组状态
+                this.updateFilterTagsState();
+            }
+        });
+
         // 侧边栏遮罩点击事件
         DOM.sidebarOverlay.addEventListener('click', () => {
             this.closeSidebar();
@@ -1653,6 +1683,7 @@ class HikingApp {
         const totalRoutes = AppState.routes.length;
         const filteredRoutes = AppState.filteredRoutes.length;
         const currentFilter = AppState.currentFilter;
+        const currentDifficultyFilter = AppState.currentDifficultyFilter;
         const searchQuery = AppState.searchQuery;
 
         // 创建或获取搜索统计元素
@@ -1664,21 +1695,34 @@ class HikingApp {
         }
 
         let statsHTML = '';
+        let hasActiveFilters = searchQuery || currentFilter !== 'all' || currentDifficultyFilter !== 'all';
         
         // 显示搜索结果统计
-        if (searchQuery || currentFilter !== 'all') {
+        if (hasActiveFilters) {
             statsHTML = `<span class="results-count">${filteredRoutes}</span> 个结果`;
             
-            // 添加筛选标签信息
+            // 添加难度筛选信息
+            if (currentDifficultyFilter !== 'all') {
+                const difficultyActiveTag = document.querySelector(`[data-difficulty="${currentDifficultyFilter}"]`);
+                const difficultyName = difficultyActiveTag ? difficultyActiveTag.textContent.trim() : '';
+                let difficultyType = '';
+                if (currentDifficultyFilter === '简单') difficultyType = 'simple';
+                else if (currentDifficultyFilter === '中等') difficultyType = 'medium';
+                else if (currentDifficultyFilter === '困难') difficultyType = 'hard';
+                statsHTML += ` · <span class="filter-indicator" data-type="${difficultyType}">${difficultyName}</span>`;
+            }
+            
+            // 添加类型筛选标签信息
             if (currentFilter !== 'all') {
-                const activeTag = DOM.filterTags.querySelector('.filter-tag.active');
+                const activeTag = document.querySelector(`[data-filter="${currentFilter}"]`);
                 const filterName = activeTag ? activeTag.textContent.trim() : '';
-                statsHTML += ` · <span class="filter-indicator">${filterName}</span>`;
+                const filterType = currentFilter;
+                statsHTML += ` · <span class="filter-indicator" data-type="${filterType}">${filterName}</span>`;
             }
             
             // 添加搜索查询信息
             if (searchQuery) {
-                statsHTML += ` · 搜索: "${searchQuery}"`;
+                statsHTML += ` · <span class="filter-indicator" data-type="search">搜索: "${searchQuery}"</span>`;
             }
         } else {
             statsHTML = `共 <span class="results-count">${totalRoutes}</span> 条路线`;
@@ -1758,10 +1802,17 @@ class HikingApp {
     }
 
     loadRoutes() {
-        // 生成模拟路线数据
-        AppState.routes = Utils.generateMockRoutes();
-        AppState.filteredRoutes = [...AppState.routes];
-        
+        // 使用从 data/routes.js 加载的真实路线数据
+        if (window.hikingRoutes && window.hikingRoutes.length > 0) {
+            AppState.routes = window.hikingRoutes;
+            AppState.filteredRoutes = [...AppState.routes];
+            console.log('已加载真实路线数据，共', AppState.routes.length, '条路线');
+        } else {
+            // 备用：使用模拟路线数据
+            console.log('未找到真实路线数据，使用模拟数据');
+            AppState.routes = Utils.generateMockRoutes();
+            AppState.filteredRoutes = [...AppState.routes];
+        }
 
         
         // 初始化地图

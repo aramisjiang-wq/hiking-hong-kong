@@ -707,11 +707,50 @@
 
         .filter-indicator {
             padding: 2px var(--space-2);
-            background: var(--primary-light);
-            color: var(--primary-dark);
             border-radius: var(--radius-sm);
             font-size: var(--font-size-xs);
             font-weight: var(--font-weight-medium);
+        }
+        
+        /* 不同类型筛选标签的颜色方案 - 明亮色彩 */
+        .filter-indicator[data-type="mountain"] {
+            background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="coast"] {
+            background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="cultural"] {
+            background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="water"] {
+            background: linear-gradient(135deg, #00BCD4 0%, #26C6DA 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="simple"] {
+            background: linear-gradient(135deg, #8BC34A 0%, #9CCC65 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="medium"] {
+            background: linear-gradient(135deg, #FFC107 0%, #FFD54F 100%);
+            color: #333333;
+        }
+        
+        .filter-indicator[data-type="hard"] {
+            background: linear-gradient(135deg, #FF5722 0%, #FF7043 100%);
+            color: white;
+        }
+        
+        .filter-indicator[data-type="search"] {
+            background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 100%);
+            color: white;
         }
 
         /* 搜索框加载状态 */
@@ -934,6 +973,77 @@
             align-items: center;
             gap: var(--space-1);
             font-weight: 500;
+        }
+
+        /* 难度标签样式 */
+        .difficulty-tag {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .difficulty-tag.easy {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+        }
+
+        .difficulty-tag.medium {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+        }
+
+        .difficulty-tag.hard {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+        }
+
+        .difficulty-tag.easy::before {
+            content: "🌱";
+        }
+
+        .difficulty-tag.medium::before {
+            content: "⛰️";
+        }
+
+        .difficulty-tag.hard::before {
+            content: "🏔️";
+        }
+
+        /* 筛选区域样式 */
+        .filter-section {
+            margin-bottom: 1rem;
+        }
+
+        .filter-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        /* 难度筛选标签样式 */
+        .difficulty-easy {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+        }
+
+        .difficulty-medium {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            color: white;
+        }
+
+        .difficulty-hard {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
         }
 
         /* 路线列表整体间距优化 - 保持与上方定义一致 */
@@ -1526,22 +1636,23 @@
         }
 
         .marker-pin {
-            width: 30px;
-            height: 30px;
+            width: 40px;
+            height: 40px;
             border-radius: 50% 50% 50% 0;
             position: relative;
             transform: rotate(-45deg);
             left: 50%;
             top: 50%;
-            margin: -15px 0 0 -15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            margin: -20px 0 0 -20px;
+            box-shadow: 0 4px 12px rgba(0, 120, 168, 0.4), 0 0 0 2px rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, #0078A8 0%, #005a87 100%);
         }
 
         .marker-pin::after {
             content: '';
-            width: 14px;
-            height: 14px;
-            margin: 8px 0 0 8px;
+            width: 18px;
+            height: 18px;
+            margin: 11px 0 0 11px;
             background: inherit;
             position: absolute;
             border-radius: 50%;
@@ -1559,11 +1670,22 @@
 
         .marker-icon {
             position: absolute;
-            margin: 11px 0 0 11px;
+            margin: 15px 0 0 15px;
             top: 0;
             left: 0;
             transform: rotate(45deg);
             z-index: 1;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .custom-marker:hover .marker-pin {
+            transform: rotate(-45deg) scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 120, 168, 0.6), 0 0 0 3px rgba(255, 255, 255, 0.9);
+        }
+
+        .custom-marker:hover .marker-icon {
+            transform: rotate(45deg) scale(1.2);
         }
 
         .start-pin {
@@ -1632,11 +1754,23 @@
                     <i class="fas fa-search search-icon"></i>
                     <input type="text" class="search-input" id="searchInput" placeholder="找找看有没有你心动的徒步路线...">
                 </div>
-                <div class="filter-tags" id="filterTags">
-                    <div class="filter-tag active" data-filter="all">全部</div>
-                    <div class="filter-tag" data-filter="mountain">山峰远景</div>
-                    <div class="filter-tag" data-filter="coast">海岸徒步</div>
-                    <div class="filter-tag" data-filter="cultural">文化历史</div>
+                <div class="filter-section">
+                    <div class="filter-title">类型筛选</div>
+                    <div class="filter-tags" id="filterTags">
+                        <div class="filter-tag active" data-filter="all">全部</div>
+                        <div class="filter-tag" data-filter="mountain">山峰远景</div>
+                        <div class="filter-tag" data-filter="coast">海岸徒步</div>
+                        <div class="filter-tag" data-filter="cultural">文化历史</div>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-title">难度筛选</div>
+                    <div class="filter-tags" id="difficultyTags">
+                        <div class="filter-tag active" data-difficulty="all">全部</div>
+                        <div class="filter-tag difficulty-easy" data-difficulty="简单">简单</div>
+                        <div class="filter-tag difficulty-medium" data-difficulty="中等">中等</div>
+                        <div class="filter-tag difficulty-hard" data-difficulty="困难">困难</div>
+                    </div>
                 </div>
             </div>
             

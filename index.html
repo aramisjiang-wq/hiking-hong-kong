@@ -3,53 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>香港徒步路线探索 | 发现城市边缘的美丽足迹</title>
+    <title>香港徒步路线大全 🏔️ | 您的专属探索之旅即将开始</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* 现代配色系统 - 自然主题 */
-            --primary-color: #10B981; /* 翡翠绿 - 自然、健康 */
-            --primary-light: #6EE7B7; /* 浅翡翠绿 */
-            --primary-dark: #047857; /* 深翡翠绿 */
-            --secondary-color: #3B82F6; /* 天空蓝 - 科技、现代 */
-            --accent-color: #F59E0B; /* 琥珀色 - 温暖、活力 */
-            --success-color: #10B981; /* 成功绿 */
-            --warning-color: #F59E0B; /* 警告琥珀 */
-            --error-color: #EF4444; /* 错误红 */
+            /* 极简香港特色配色系统 */
+            /* 香港经典色彩：维多利亚港蓝、港式红、元朗绿、天坛紫 */
+            --victoria-blue: #0078A8; /* 维多利亚港主蓝色 */
+            --victoria-light: #4A9BC8; /* 浅维多利亚蓝 */
+            --victoria-dark: #005580; /* 深维多利亚蓝 */
+            --hong-kong-gold: #D4AF37; /* 香港传统金色 */
+            --hong-kong-red: #C8102E; /* 港式红 */
+            --yuan-long-green: #6B8E23; /* 元朗绿 */
+            --temple-purple: #663399; /* 天坛紫 */
             
-            /* 灰度系统 - 现代中性色 */
-            --gray-50: #F9FAFB;
-            --gray-100: #F3F4F6;
-            --gray-200: #E5E7EB;
-            --gray-300: #D1D5DB;
-            --gray-400: #9CA3AF;
-            --gray-500: #6B7280;
-            --gray-600: #4B5563;
-            --gray-700: #374151;
-            --gray-800: #1F2937;
-            --gray-900: #111827;
+            /* 极简中性色系统 - 更纯净的黑白灰 */
+            --pure-white: #FFFFFF;
+            --off-white: #FAFAFA;
+            --light-gray: #F5F5F5;
+            --border-gray: #E0E0E0;
+            --text-gray: #9E9E9E;
+            --medium-gray: #757575;
+            --dark-gray: #424242;
+            --charcoal: #212121;
+            --pure-black: #000000;
             
-            /* 路线卡片专用色彩 */
-            --route-card-bg: #FFFFFF;
-            --route-card-hover: #F0FDF4; /* 轻微绿色调背景 */
-            --route-card-active: linear-gradient(135deg, var(--primary-color) 0%, #059669 100%);
-            --route-card-border: var(--gray-200);
-            --route-card-border-hover: var(--primary-color);
-            --route-text-primary: var(--gray-900);
-            --route-text-secondary: var(--gray-600);
-            --route-text-muted: var(--gray-500);
+            /* 香港特色渐变 */
+            --sky-gradient: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 50%, #90CAF9 100%); /* 天空蓝渐变 */
+            --harbour-gradient: linear-gradient(135deg, #0078A8 0%, #0277BD 50%, #0288D1 100%); /* 港湾渐变 */
+            --urban-gradient: linear-gradient(135deg, #FAFAFA 0%, #F5F5F5 50%, #EEEEEE 100%); /* 都市灰渐变 */
+            --sunset-gradient: linear-gradient(135deg, #FF8A65 0%, #FF5722 50%, #D84315 100%); /* 港式日落渐变 */
             
-            /* 文字颜色 */
-            --text-primary: var(--gray-900);
-            --text-secondary: var(--gray-600);
-            --text-muted: var(--gray-500);
+            /* 功能性配色 */
+            --primary-color: var(--victoria-blue);
+            --primary-light: var(--victoria-light);
+            --primary-dark: var(--victoria-dark);
+            --secondary-color: var(--hong-kong-gold);
+            --accent-color: var(--hong-kong-red);
+            --success-color: var(--yuan-long-green);
+            --warning-color: var(--hong-kong-gold);
+            --error-color: var(--hong-kong-red);
             
-            /* 背景颜色 */
-            --bg-primary: #FFFFFF;
-            --bg-secondary: #F9FAFB;
-            --bg-tertiary: #F3F4F6;
+            /* 文字颜色 - 极简设计 */
+            --text-primary: var(--charcoal);
+            --text-secondary: var(--dark-gray);
+            --text-muted: var(--text-gray);
+            --text-light: var(--medium-gray);
+            
+            /* 背景颜色 - 极简设计 */
+            --bg-primary: var(--pure-white);
+            --bg-secondary: var(--off-white);
+            --bg-tertiary: var(--light-gray);
+            --bg-surface: var(--pure-white);
+            
+            /* 边框和分割线 */
+            --border-light: var(--border-gray);
+            --border-medium: var(--text-gray);
+            --divider-color: var(--border-gray);
+            
+            /* 灰度变量兼容 */
+            --stone-light: var(--off-white);
+            --stone-100: var(--light-gray);
+            --stone-200: var(--border-gray);
+            --stone-300: var(--text-gray);
+            --stone-400: var(--medium-gray);
+            --stone-500: var(--medium-gray);
+            --stone-600: var(--dark-gray);
+            --stone-700: var(--charcoal);
+            --stone-800: var(--charcoal);
+            --stone-900: var(--pure-black);
+            
+            /* 路线卡片专用色彩 - 极简香港主题 */
+            --route-card-bg: var(--pure-white);
+            --route-card-hover: var(--urban-gradient); /* 都市灰渐变背景 */
+            --route-card-active: var(--harbour-gradient);
+            --route-card-border: var(--border-gray);
+            --route-card-border-hover: var(--victoria-blue);
+            --route-text-primary: var(--charcoal);
+            --route-text-secondary: var(--dark-gray);
+            --route-text-muted: var(--text-gray);
             
             /* 阴影系统 */
             --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -74,15 +108,37 @@
             --space-10: 2.5rem;
             --space-12: 3rem;
             
-            /* 字体大小 */
-            --text-xs: 0.75rem;
-            --text-sm: 0.875rem;
-            --text-base: 1rem;
-            --text-lg: 1.125rem;
-            --text-xl: 1.25rem;
-            --text-2xl: 1.5rem;
-            --text-3xl: 1.875rem;
-            --text-4xl: 2.25rem;
+            /* 字体设置 - 宋体系统 */
+            --font-primary: 'Songti SC', 'SimSun', 'STSong', '宋体', serif;
+            --font-secondary: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            --font-mono: 'Courier New', 'Monaco', monospace;
+            --font-size-xs: 0.75rem; /* 12px */
+            --font-size-sm: 0.875rem; /* 14px */
+            --font-size-base: 1rem; /* 16px */
+            --font-size-lg: 1.125rem; /* 18px */
+            --font-size-xl: 1.25rem; /* 20px */
+            --font-size-2xl: 1.5rem; /* 24px */
+            --font-size-3xl: 1.875rem; /* 30px */
+            --font-size-4xl: 2.25rem; /* 36px */
+            --font-weight-light: 400;
+            --font-weight-normal: 500;
+            --font-weight-medium: 600;
+            --font-weight-semibold: 700;
+            --font-weight-bold: 800;
+            
+            /* 间距系统 - 自然比例 */
+            --space-1: 0.25rem; /* 4px */
+            --space-2: 0.5rem; /* 8px */
+            --space-3: 0.75rem; /* 12px */
+            --space-4: 1rem; /* 16px */
+            --space-5: 1.25rem; /* 20px */
+            --space-6: 1.5rem; /* 24px */
+            --space-8: 2rem; /* 32px */
+            --space-10: 2.5rem; /* 40px */
+            --space-12: 3rem; /* 48px */
+            --space-16: 4rem; /* 64px */
+            --space-20: 5rem; /* 80px */
+            --space-24: 6rem; /* 96px */
         }
 
         * {
@@ -92,14 +148,13 @@
         }
 
         body {
-            font-family: 'Noto Sans SC', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-secondary);
+            font-family: var(--font-primary);
+            background: var(--urban-gradient);
             color: var(--text-primary);
             line-height: 1.6;
             overflow: hidden;
         }
 
-        /* 主布局容器 */
         .app-container {
             display: flex;
             height: 100vh;
@@ -107,34 +162,56 @@
         }
 
         /* 地图容器 */
-        #map {
-            flex: 1;
+        /* 地图容器 - 适应左侧侧边栏 */
+        .map-container {
+            margin-left: 380px;
             position: relative;
-            background: var(--gray-200);
+            height: 100vh;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar.collapsed + .map-container {
+            margin-left: 0;
+        }
+        
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 0;
         }
 
         /* 侧边栏 */
         .sidebar {
-            width: 420px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 380px;
             height: 100vh;
             background: var(--bg-primary);
-            box-shadow: var(--shadow-xl);
+            border-right: 1px solid var(--route-card-border);
             transform: translateX(0);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
-            position: relative;
             z-index: 1000;
+            box-shadow: var(--shadow-xl);
         }
-
+        
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        
+        /* 侧边栏头部 */
         .sidebar-header {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-light) 100%);
+            background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.5)), url('./natalya-letunova-lZXyGjsRnP0-unsplash.jpg');
+            background-size: cover;
+            background-position: center center;
             color: white;
             padding: var(--space-6) var(--space-6) var(--space-4);
             position: relative;
             overflow: hidden;
         }
-
+        
         .sidebar-header::before {
             content: '';
             position: absolute;
@@ -323,25 +400,35 @@
 
         .modal-close {
             position: absolute;
-            top: var(--space-4);
-            right: var(--space-4);
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: var(--text-lg);
-            color: var(--text-primary);
-            transition: all 0.2s ease;
+            font-size: 16px;
+            color: var(--forest-dark);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 10;
         }
 
         .modal-close:hover {
-            background: white;
-            transform: scale(1.1);
+            background: linear-gradient(135deg, var(--forest-light) 0%, var(--forest-primary) 100%);
+            color: white;
+            transform: scale(1.08) translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 120, 168, 0.3); /* 维多利亚港蓝 */
+        }
+
+        .modal-close:active {
+            transform: scale(0.95);
+            transition: all 0.1s ease;
         }
 
         .modal-body {
@@ -499,11 +586,14 @@
         }
 
         .sidebar-header h1 {
-            font-size: var(--text-2xl);
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: 600;
+            font-family: 'Songti SC', 'SimSun', 'STSong', '宋体', serif;
             margin-bottom: var(--space-2);
             position: relative;
             z-index: 1;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .sidebar-header p {
@@ -537,10 +627,50 @@
         }
 
         /* 搜索和筛选区域 */
-        .search-filters {
-            padding: var(--space-6);
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--gray-200);
+        /* 搜索区域 - 自然主题 */
+        .search-section {
+            padding: var(--space-4) var(--space-5);
+            border-bottom: 1px solid var(--route-card-border);
+            background: linear-gradient(135deg, var(--stone-light) 0%, #F0FDF4 100%);
+            flex-shrink: 0;
+        }
+        
+        .search-container {
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.5rem;
+            border: 2px solid var(--stone-200);
+            border-radius: var(--radius-lg);
+            font-size: var(--font-size-base);
+            font-family: var(--font-primary);
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(34, 139, 34, 0.1), var(--shadow-md);
+            transform: translateY(-1px);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: var(--space-3);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: var(--font-size-lg);
+            z-index: 1;
         }
 
         .search-box {
@@ -555,7 +685,7 @@
 
         .search-stats {
             margin-top: var(--space-2);
-            font-size: var(--text-sm);
+            font-size: var(--font-size-sm);
             color: var(--text-muted);
             display: flex;
             align-items: center;
@@ -571,7 +701,7 @@
         }
 
         .results-count {
-            font-weight: 500;
+            font-weight: var(--font-weight-medium);
             color: var(--primary-color);
         }
 
@@ -580,44 +710,12 @@
             background: var(--primary-light);
             color: var(--primary-dark);
             border-radius: var(--radius-sm);
-            font-size: var(--text-xs);
-            font-weight: 500;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            font-size: var(--text-base);
-            background: var(--bg-primary);
-            transition: all 0.2s ease;
-            outline: none;
-            font-family: inherit;
-            color: var(--text-primary);
-        }
-
-        .search-input::placeholder {
-            color: var(--text-muted);
-            transition: color 0.2s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1), var(--shadow-md);
-            transform: translateY(-1px);
-        }
-
-        .search-input:focus::placeholder {
-            color: var(--gray-400);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
         }
 
         /* 搜索框加载状态 */
         .search-input.searching {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m13 8 3 3-3 3'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right var(--space-3) center;
-            background-size: 16px;
             animation: searching-pulse 1.5s ease-in-out infinite;
         }
 
@@ -643,14 +741,15 @@
 
         .filter-tag {
             padding: var(--space-2) var(--space-4);
-            border: 2px solid var(--gray-200);
-            border-radius: var(--radius-xl);
-            background: var(--surface-color);
-            color: var(--text-primary);
-            font-size: var(--text-sm);
-            font-weight: 500;
+            border: 2px solid var(--urban-light);
+            border-radius: var(--border-radius);
+            background: white;
+            color: #000000;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            font-family: var(--font-primary);
             cursor: pointer;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             outline: none;
             user-select: none;
             position: relative;
@@ -664,25 +763,30 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s ease;
+            background: var(--urban-gradient);
+            transition: left 0.3s ease;
+            z-index: -1;
         }
 
         .filter-tag:hover::before {
-            left: 100%;
+            left: 0;
         }
 
         .filter-tag:hover {
-            border-color: var(--primary-light);
-            background: var(--primary-light);
-            color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            border-color: var(--urban-dark);
+            color: #000000;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .filter-tag:hover > * {
+            position: relative;
+            z-index: 1;
         }
 
         .filter-tag:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+            border-color: var(--urban-dark);
+            box-shadow: 0 0 0 3px rgba(0, 120, 168, 0.2);
         }
 
         .filter-tag:active {
@@ -691,16 +795,16 @@
         }
 
         .filter-tag.active {
-            background: var(--primary-color);
-            border-color: var(--primary-color);
-            color: white;
+            background: var(--urban-gradient);
+            border-color: var(--urban-dark);
+            color: #000000;
             box-shadow: var(--shadow-md);
             transform: translateY(-1px);
         }
 
         .filter-tag.active:hover {
-            background: var(--primary-dark);
-            border-color: var(--primary-dark);
+            background: var(--urban-dark);
+            border-color: var(--urban-dark);
             transform: translateY(-2px);
         }
 
@@ -723,18 +827,19 @@
         .routes-list {
             display: flex;
             flex-direction: column;
-            gap: var(--space-3);
+            gap: var(--space-2);
         }
 
         .route-item {
             background: var(--route-card-bg);
-            border-radius: var(--radius-lg);
-            padding: var(--space-5);
+            border-radius: var(--border-radius);
+            padding: var(--space-3);
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1.5px solid var(--route-card-border);
+            transition: all 0.3s ease;
+            border: 1px solid var(--route-card-border);
             position: relative;
             overflow: hidden;
+            font-family: var(--font-primary);
         }
 
         .route-item::before {
@@ -744,15 +849,15 @@
             left: 0;
             right: 0;
             height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            background: var(--forest-gradient);
             transform: scaleX(0);
             transition: transform 0.3s ease;
         }
 
         .route-item:hover {
             transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--route-card-border-hover);
+            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.15);
+            border-color: var(--forest-green);
             background: var(--route-card-hover);
         }
 
@@ -763,23 +868,24 @@
         .route-item.active {
             background: var(--route-card-active);
             color: white;
-            border-color: var(--primary-color);
+            border-color: var(--forest-dark);
             transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.3);
         }
 
         .route-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: var(--space-4);
+            margin-bottom: var(--space-2);
         }
 
         .route-title {
-            font-size: var(--text-xl);
+            font-size: var(--text-lg);
             font-weight: 600;
             color: inherit;
             margin: 0;
-            line-height: 1.5;
+            line-height: 1.4;
             letter-spacing: -0.01em;
         }
 
@@ -793,10 +899,10 @@
         .route-location {
             font-size: var(--text-sm);
             color: var(--route-text-secondary);
-            margin-bottom: var(--space-4);
+            margin-bottom: var(--space-2);
             display: flex;
             align-items: center;
-            gap: var(--space-2);
+            gap: var(--space-1);
             font-weight: 500;
             line-height: 1.4;
         }
@@ -804,8 +910,8 @@
         .route-features {
             font-size: var(--text-sm);
             color: var(--route-text-muted);
-            line-height: 1.7;
-            margin-bottom: var(--space-4);
+            line-height: 1.5;
+            margin-bottom: var(--space-2);
         }
 
         .route-item.active .route-features {
@@ -814,7 +920,7 @@
 
         .route-meta {
             display: flex;
-            gap: var(--space-5);
+            gap: var(--space-3);
             font-size: var(--text-xs);
             color: var(--route-text-muted);
         }
@@ -830,11 +936,11 @@
             font-weight: 500;
         }
 
-        /* 路线列表整体间距优化 */
+        /* 路线列表整体间距优化 - 保持与上方定义一致 */
         .routes-list {
             display: flex;
             flex-direction: column;
-            gap: var(--space-4);
+            gap: var(--space-2);
         }
         .sidebar.mobile-closed {
             transform: translateX(-100%);
@@ -858,32 +964,7 @@
             visibility: visible;
         }
 
-        /* 移动端切换按钮 */
-        .mobile-toggle {
-            position: fixed;
-            top: var(--space-4);
-            left: var(--space-4);
-            z-index: 1001;
-            background: var(--bg-primary);
-            border: none;
-            padding: var(--space-3);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: var(--text-lg);
-            color: var(--primary-color);
-        }
 
-        .mobile-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-xl);
-        }
 
         /* 加载状态 */
         .loading-state {
@@ -941,7 +1022,7 @@
             background: var(--gray-400);
         }
 
-        /* 响应式设计 */
+        /* 响应式设计 - 自然主题 */
         @media (max-width: 768px) {
             /* 移动端整体布局 */
             .sidebar {
@@ -951,9 +1032,9 @@
                 top: 0;
                 left: 0;
                 z-index: 1000;
-                background: var(--surface-color);
+                background: var(--bg-primary);
                 transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: transform 0.3s ease;
                 border-radius: 0;
                 border: none;
                 box-shadow: none;
@@ -979,9 +1060,19 @@
 
             .sidebar-header {
                 padding: 1.5rem 1rem 1rem;
-                background: var(--surface-color);
-                border-bottom: 1px solid var(--border-color);
+                background: var(--forest-gradient);
+                border-bottom: 1px solid var(--route-card-border);
                 flex-shrink: 0;
+                color: white;
+            }
+            
+            .sidebar-header .sidebar-title {
+                color: white;
+                text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            }
+            
+            .sidebar-header .stat-number {
+                color: white;
             }
 
             .sidebar-title {
@@ -1015,8 +1106,8 @@
             /* 搜索和筛选 */
             .search-filters {
                 padding: 1rem;
-                background: var(--bg-primary);
-                border-bottom: 1px solid var(--border-color);
+                background: linear-gradient(135deg, var(--stone-light) 0%, #F0FDF4 100%);
+                border-bottom: 1px solid var(--route-card-border);
                 flex-shrink: 0;
             }
 
@@ -1037,7 +1128,7 @@
 
             .search-input:focus {
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+                box-shadow: 0 0 0 3px rgba(0, 120, 168, 0.15); /* 维多利亚港蓝 */
                 transform: none;
             }
 
@@ -1064,29 +1155,47 @@
             .filter-tag {
                 padding: 10px 16px;
                 font-size: 0.875rem;
+                font-family: var(--font-primary);
                 border-radius: 10px;
                 white-space: nowrap;
                 min-width: fit-content;
-                border: 2px solid var(--gray-200);
-                background: var(--surface-color);
-                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                border: 2px solid var(--stone-200);
+                background: linear-gradient(135deg, white 0%, var(--stone-light) 100%);
+                color: var(--rock-gray);
+                transition: all 0.3s ease;
                 -webkit-tap-highlight-color: transparent;
                 touch-action: manipulation;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .filter-tag::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: var(--forest-gradient);
+                transition: left 0.3s ease;
+                z-index: -1;
             }
 
             .filter-tag:hover {
+                border-color: var(--forest-green);
                 transform: translateY(-1px);
             }
 
             .filter-tag:active {
                 transform: scale(0.98);
+                transition: all 0.1s ease;
             }
 
             .filter-tag.active {
-                background: var(--primary-color);
-                border-color: var(--primary-color);
+                background: var(--forest-gradient);
+                border-color: var(--forest-dark);
                 color: white;
-                box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+                box-shadow: 0 2px 8px rgba(34, 139, 34, 0.3);
             }
 
             .filter-tag.active:hover {
@@ -1169,32 +1278,7 @@
                 visibility: visible;
             }
 
-            /* 移动端切换按钮 */
-            .mobile-toggle {
-                position: fixed;
-                top: 1rem;
-                left: 1rem;
-                z-index: 1001;
-                background: var(--surface-color);
-                border: none;
-                border-radius: 12px;
-                padding: 12px;
-                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                color: var(--primary-color);
-                font-size: 1.25rem;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                width: 48px;
-                height: 48px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
 
-            .mobile-toggle:active {
-                transform: scale(0.95);
-                background: var(--primary-light);
-            }
 
             /* 地图容器 */
             .map-container {
@@ -1300,10 +1384,34 @@
             }
 
             .mobile-toggle {
-                padding: 10px;
-                font-size: 1.125rem;
-                width: 44px;
-                height: 44px;
+                padding: 12px;
+                font-size: 16px;
+                width: 48px;
+                height: 48px;
+                top: 0.875rem;
+                left: 0.875rem;
+            }
+
+            /* 确保小屏幕下按钮与内容不冲突 */
+            @media (max-width: 480px) {
+                .mobile-toggle {
+                    top: 12px;
+                    left: 12px;
+                    width: 44px;
+                    height: 44px;
+                    padding: 10px;
+                    font-size: 16px;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 12px rgba(0, 120, 168, 0.25), 0 1px 4px rgba(0, 0, 0, 0.1); /* 维多利亚港蓝 */
+                }
+
+                .mobile-toggle:hover {
+                    transform: scale(1.05) translateY(-1px);
+                }
+
+                .mobile-toggle:active {
+                    transform: scale(0.92);
+                }
             }
         }
 
@@ -1401,12 +1509,114 @@
                 transform: translateX(0);
             }
         }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(100%);
+            }
+        }
+
+        /* 自定义标记样式 */
+        .custom-marker {
+            background: transparent;
+            border: none;
+        }
+
+        .marker-pin {
+            width: 30px;
+            height: 30px;
+            border-radius: 50% 50% 50% 0;
+            position: relative;
+            transform: rotate(-45deg);
+            left: 50%;
+            top: 50%;
+            margin: -15px 0 0 -15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .marker-pin::after {
+            content: '';
+            width: 14px;
+            height: 14px;
+            margin: 8px 0 0 8px;
+            background: inherit;
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .marker-pin::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            margin: 11px 0 0 11px;
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .marker-icon {
+            position: absolute;
+            margin: 11px 0 0 11px;
+            top: 0;
+            left: 0;
+            transform: rotate(45deg);
+            z-index: 1;
+        }
+
+        .start-pin {
+            background: #059669; /* 绿色 */
+        }
+
+        .end-pin {
+            background: #DC2626; /* 红色 */
+        }
+
+        .start-end-marker {
+            z-index: 1000;
+        }
+
+        /* Leaflet地图标记覆盖样式 */
+        .leaflet-marker-icon {
+            margin-left: -12px !important;
+            margin-top: -41px !important;
+        }
+
+        .start-end-marker .leaflet-marker-icon {
+            margin-left: -15px !important;
+            margin-top: -15px !important;
+        }
+
+        /* 弹窗样式优化 */
+        .leaflet-popup-content-wrapper {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .leaflet-popup-content {
+            margin: 16px 20px;
+            line-height: 1.6;
+            font-family: var(--font-primary);
+        }
+
+        .popup-content {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .popup-content .popup-icon {
+            font-size: 1.2em;
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body>
     <div class="app-container">
         <!-- 地图容器 -->
-        <div id="map"></div>
+        <div id="map" style="background: linear-gradient(45deg, rgba(0, 120, 168, 0.05), rgba(255, 255, 255, 0.8), rgba(0, 120, 168, 0.03)), url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cdefs%3E%3Cpattern id=%22harbour%22 patternUnits=%22userSpaceOnUse%22 width=%22100%22 height=%22100%22%3E%3Crect width=%22100%22 height=%22100%22 fill=%22rgba(0,120,168,0.02)%22/%3E%3Cpath d=%22M10 90 Q50 10 90 90%22 stroke=%22rgba(0,120,168,0.1)%22 stroke-width=%222%22 fill=%22none%22 opacity=%220.3%22/%3E%3Cpath d=%22M5 70 Q50 5 95 70%22 stroke=%22rgba(0,120,168,0.08)%22 stroke-width=%221.5%22 fill=%22none%22 opacity=%220.4%22/%3E%3C/pattern%3E%3C/defs%3E%3Crect width=%22100%22 height=%22100%22 fill=%22url(%2523harbour)%22/%3E%3C/svg%3E'); background-blend-mode: overlay;"></div>
         
         <!-- 移动端遮罩层 -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
@@ -1414,28 +1624,16 @@
         <!-- 侧边栏 -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1>香港徒步路线</h1>
-                <p>探索城市边缘的美丽足迹</p>
-                <div class="stats-bar">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalRoutes">20</span>
-                        <span class="stat-label">精选路线</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalViews">0</span>
-                        <span class="stat-label">浏览次数</span>
-                    </div>
-                </div>
+                <h1 class="main-title">🏔️ 香港徒步</h1>
             </div>
             
             <div class="search-filters">
                 <div class="search-box">
                     <i class="fas fa-search search-icon"></i>
-                    <input type="text" class="search-input" id="searchInput" placeholder="搜索路线名称或地点...">
+                    <input type="text" class="search-input" id="searchInput" placeholder="找找看有没有你心动的徒步路线...">
                 </div>
                 <div class="filter-tags" id="filterTags">
                     <div class="filter-tag active" data-filter="all">全部</div>
-                    <div class="filter-tag" data-filter="water">水塘风景</div>
                     <div class="filter-tag" data-filter="mountain">山峰远景</div>
                     <div class="filter-tag" data-filter="coast">海岸徒步</div>
                     <div class="filter-tag" data-filter="cultural">文化历史</div>
@@ -1460,10 +1658,7 @@
             </div>
         </aside>
         
-        <!-- 移动端切换按钮 -->
-        <button class="mobile-toggle" id="mobileToggle">
-            <i class="fas fa-bars"></i>
-        </button>
+
     </div>
 
     <!-- 加载状态覆盖层 -->
@@ -1524,7 +1719,6 @@
                     <ul class="transportation-steps" id="transportationSteps">
                         <li>
                             <div class="step-number">1</div>
-                            <div>第一步交通指示...</div>
                         </li>
                     </ul>
                 </div>

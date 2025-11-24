@@ -1,6 +1,6 @@
 # 🌄 Hong Kong Hiking Routes - Web Application
 
-一个现代化的香港远足路线搜索和筛选Web应用，提供直观的用户界面和流畅的交互体验。
+一个现代化的香港远足路线搜索和筛选Web应用，提供直观的用户界面、交互式地图显示和流畅的用户体验。
 
 ## 🚀 特性
 
@@ -10,11 +10,19 @@
 - **搜索统计**: 显示结果数量和当前筛选条件
 - **搜索状态反馈**: 加载状态指示器
 
+### 🗺️ 交互式地图显示
+- **起点终点标记**: 绿色起点和红色终点标记，清晰显示路线起终点
+- **自定义地图图标**: 精美的divIcon设计，带阴影和悬停效果
+- **地图瓦片服务**: 多源瓦片服务支持（OpenStreetMap、CartoDB等）
+- **离线模式支持**: 网络失败时自动切换到离线地图
+- **弹窗信息**: 点击标记显示详细信息
+
 ### 🎨 现代化UI/UX设计
 - **响应式布局**: 完美适配桌面端和移动端
 - **流畅动画**: 悬停效果、过渡动画、点击反馈
 - **直观导航**: 移动端侧边栏导航
 - **状态可视化**: 筛选标签的选中状态
+- **视觉层次**: 颜色编码和图标系统
 
 ### 📱 移动端优化
 - **触摸友好**: 专为移动设备优化的交互
@@ -25,33 +33,39 @@
 - **现代浏览器兼容**: Chrome、Firefox、Safari、Edge
 - **性能优化**: 快速加载和流畅操作
 - **无障碍访问**: 支持键盘导航和屏幕阅读器
+- **错误处理**: 智能的错误恢复和用户提示
 
 ## 🌐 在线访问
 
 项目已部署到GitHub Pages，您可以通过以下方式访问：
 
 - **主应用**: [GitHub Repository](https://github.com/aramisjiang-wq/hiking-hong-kong)
-- **本地开发**: `http://localhost:8000`
+- **本地开发**: `http://localhost:5173/`
 
 ## 🛠️ 技术栈
 
 - **前端**: HTML5, CSS3, JavaScript (ES6+)
+- **地图库**: Leaflet.js - 轻量级交互式地图
 - **架构**: 模块化JavaScript设计
 - **样式**: CSS Grid, Flexbox, CSS动画
-- **工具**: Git版本控制, 本地HTTP服务器
+- **构建工具**: Vite - 现代化前端构建工具
+- **版本控制**: Git
 
 ## 📁 项目结构
 
 ```
 hiking-hong-kong/
-├── index.html              # 主应用界面
-├── app.js                  # 核心JavaScript功能
+├── index.html                    # 主应用界面
+├── app.js                        # 核心JavaScript功能
+├── package.json                  # 项目依赖配置
+├── package-lock.json             # 依赖锁定文件
 ├── data/
-│   └── routes.js          # 远足路线数据
-├── test_compatibility.html # 浏览器兼容性测试
-├── test_search.html        # 搜索功能测试
+│   ├── routes.js                # 远足路线数据
+│   └── routes_backup.js         # 数据备份
+├── test_compatibility.html       # 浏览器兼容性测试
+├── test_search.html              # 搜索功能测试
 ├── SEARCH_OPTIMIZATION_REPORT.md # 优化报告
-└── README.md              # 项目说明文档
+└── README.md                     # 项目说明文档
 ```
 
 ## 🎯 主要功能
@@ -61,6 +75,11 @@ hiking-hong-kong/
 3. **结果展示**: 清晰展示符合条件的路线
 4. **交互反馈**: 实时反馈和状态指示
 5. **移动适配**: 完整的移动端体验
+6. **交互式地图**: 显示路线起点和终点标记
+7. **地图标记**: 自定义图标和弹窗信息
+8. **离线支持**: 网络问题时的备用地图
+9. **路线详情**: 点击查看详细路线信息
+10. **交通指南**: 完整的路线交通指引
 
 ## 📊 测试与验证
 
@@ -110,20 +129,34 @@ hiking-hong-kong/
    cd hiking-hong-kong
    ```
 
-2. **启动本地服务器**:
+2. **安装依赖** (开发环境):
    ```bash
-   python3 -m http.server 8000
+   npm install
    ```
 
-3. **访问应用**:
-   打开浏览器访问 `http://localhost:8000`
+3. **启动开发服务器**:
+   ```bash
+   npm run dev
+   ```
+
+4. **访问应用**:
+   打开浏览器访问 `http://localhost:5173/`
 
 ## 🧪 运行测试
 
-- **兼容性测试**: 访问 `http://localhost:8000/test_compatibility.html`
-- **搜索测试**: 访问 `http://localhost:8000/test_search.html`
+- **兼容性测试**: 访问 `http://localhost:5173/test_compatibility.html`
+- **搜索测试**: 访问 `http://localhost:5173/test_search.html`
 
 ## 🔄 更新日志
+
+- **v3.0**: 地图功能全面升级 (2024-12-19)
+  - 集成Leaflet.js交互式地图
+  - 实现起点终点轨迹显示功能
+  - 添加自定义地图标记图标系统
+  - 支持多源地图瓦片服务
+  - 实现离线模式备用地图
+  - 修复地图初始化错误处理
+  - 优化移动端地图交互体验
 
 - **v2.0**: 搜索功能全面优化升级
   - 实现实时搜索与筛选

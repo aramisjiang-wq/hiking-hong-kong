@@ -35,7 +35,7 @@ const RouteCategories = {
 const DOM = {
     map: null,
     sidebar: null,
-    mobileToggle: null,
+    
     sidebarOverlay: null,
     searchInput: null,
     filterTags: null,
@@ -67,37 +67,31 @@ const DOM = {
     difficultyChart: null
 };
 
-// 高质量地图瓦片服务配置（按视觉质量排序）
+// 香港特色地图瓦片服务配置（网络优先，离线备用）
 const TileProviders = [
     {
-        // CartoDB Positron - 高对比度白色背景地图，最清晰
-        url: 'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
+        // OpenStreetMap标准版本（首选服务）
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+        errorTolerance: 3,
+        isPrimary: true
+    },
+    {
+        // CartoDB Light All - 经典浅色地图（备用服务）
+        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 20
+        maxZoom: 19,
+        errorTolerance: 2,
+        isBackup: true
     },
     {
-        // CartoDB Voyager - 彩色地形图
-        url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 20
-    },
-    {
-        // OpenStreetMap高清版本
-        url: 'https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="https://hot.openstreetmap.org/" target="_blank">Humanitarian OpenStreetMap Team</a>',
-        maxZoom: 19
-    },
-    {
-        // CartoDB Light All - 经典浅色地图
-        url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 19
-    },
-    {
-        // Esri World Imagery - 高清卫星地图
-        url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
-        maxZoom: 19
+        // 离线地图模式（最后的备用方案）
+        url: 'offline://hk-map/{z}/{x}/{y}.png',
+        attribution: '香港远足路线应用 - 离线模式',
+        maxZoom: 15,
+        errorTolerance: 0,
+        isOffline: true
     }
 ];
 
@@ -148,9 +142,9 @@ const Utils = {
         }
         
         const text = ((route.features || '') + ' ' + (route.name || '')).toLowerCase();
-        if (text.includes('平緩') || text.includes('簡單') || text.includes('適合新手') || text.includes('简单')) {
+        if (text.includes('平缓') || text.includes('简单') || text.includes('适合新手') || text.includes('平緩') || text.includes('簡單') || text.includes('適合新手')) {
             return { level: '简单', color: '#06D6A0' };
-        } else if (text.includes('挑戰') || text.includes('陡峭') || text.includes('有坡度') || text.includes('挑战')) {
+        } else if (text.includes('挑战') || text.includes('陡峭') || text.includes('有坡度') || text.includes('挑戰')) {
             return { level: '困难', color: '#EF4444' };
         } else {
             return { level: '中等', color: '#FFD60A' };
@@ -216,21 +210,21 @@ const Utils = {
     // 生成随机路线数据
     generateMockRoutes: (count = 15) => {
         const routeTemplates = [
-            { name: "山頂環迴步行徑", location: "香港島", features: "平緩路線，適合全家郊遊，可以欣賞維多利亞港美景" },
-            { name: "大嶼山昂坪棧道", location: "大嶼山", features: "中等難度，需要一定體力，途經天壇大佛和文化村" },
-            { name: "西貢碼頭海濱長廊", location: "西貢", features: "平緩路線，沿海而建，適合散步和觀景" },
-            { name: "獅子山國家公園健行步道", location: "新界", features: "挑戰路線，需要良好體力，山頂景色壯麗" },
-            { name: "龍脊徒步道", location: "香港島東南部", features: "中等難度，途經美麗的海崖和山峰" },
-            { name: "大埔滘自然教育徑", location: "大埔", features: "簡單路線，森林浴體驗，適合新手" },
-            { name: "石澳海灘健行步道", location: "香港島東岸", features: "平緩路線，連接美麗海灘和山徑" },
-            { name: "烏蛟騰客家古道", location: "新界東北部", features: "文化路線，體驗客家村落歷史和文化" },
-            { name: "南丫島島嶼跳躍", location: "南丫島", features: "中等難度，島嶼間健行，品嘗海鮮美食" },
-            { name: "荃灣西樓角自然徑", location: "荃灣", features: "簡單路線，都市中的綠色走廊" },
-            { name: "西貢地質公園地質步道", location: "西貢東北部", features: "地質教育路線，欣賞奇石景觀和海岸地貌" },
-            { name: "清水灣郊野公園健行", location: "清水灣", features: "平緩路線，海邊健行和燒烤設施" },
-            { name: "大帽山郊野公園山徑", location: "新界西部", features: "挑戰路線，香港最高峰，雲海奇觀" },
-            { name: "大澳漁村文化漫步", location: "大嶼山西北部", features: "文化路線，體驗漁村風情和傳統文化" },
-            { name: "香港濕地公園自然步道", location: "新界西北部", features: "生態教育路線，觀鳥和濕地生態體驗" }
+            { name: "山顶环回步行径", location: "香港岛", features: "平缓路线，适合全家郊游，可以欣赏维多利亚港美景" },
+            { name: "大屿山昂坪栈道", location: "大屿山", features: "中等难度，需要一定体力，途经天坛大佛和文化村" },
+            { name: "西贡码头海滨长廊", location: "西贡", features: "平缓路线，沿海而建，适合散步和观景" },
+            { name: "狮子山国家公园健行步道", location: "新界", features: "挑战路线，需要良好体力，山顶景色壮丽" },
+            { name: "龙脊徒步道", location: "香港岛东南部", features: "中等难度，途经美丽的海崖和山峰" },
+            { name: "大埔滘自然教育径", location: "大埔", features: "简单路线，森林浴体验，适合新手" },
+            { name: "石澳海滩健行步道", location: "香港岛东岸", features: "平缓路线，连接美丽海滩和山径" },
+            { name: "乌蛟腾客家古道", location: "新界东北部", features: "文化路线，体验客家村落历史和文化" },
+            { name: "南丫岛岛屿跳跃", location: "南丫岛", features: "中等难度，岛屿间健行，品尝海鲜美食" },
+            { name: "荃湾西楼角自然径", location: "荃湾", features: "简单路线，都市中的绿色走廊" },
+            { name: "西贡地质公园地质步道", location: "西贡东北部", features: "地质教育路线，欣赏奇石景观和海岸地貌" },
+            { name: "清水湾郊野公园健行", location: "清水湾", features: "平缓路线，沿海健行和烧烤设施" },
+            { name: "大帽山郊野公园山径", location: "新界西部", features: "挑战路线，香港最高峰，云海奇观" },
+            { name: "大澳渔村文化漫步", location: "大屿山西北部", features: "文化路线，体验渔村风情和传统文化" },
+            { name: "香港湿地公园自然步道", location: "新界西北部", features: "生态教育路线，观鸟和湿地生态体验" }
         ];
 
         const coordinates = [
@@ -308,12 +302,12 @@ class DataVisualizationManager {
                     {
                         label: '路线增长趋势',
                         data: timeSeriesData[2].points.map(p => p.y),
-                        borderColor: '#10B981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderColor: '#0078A8', // 维多利亚港蓝
+                        backgroundColor: 'rgba(0, 120, 168, 0.1)',
                         borderWidth: 3,
                         fill: true,
                         tension: 0.4,
-                        pointBackgroundColor: '#10B981',
+                        pointBackgroundColor: '#0078A8',
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 2,
                         pointRadius: 6,
@@ -586,36 +580,67 @@ class RouteDetailManager {
 class MapManager {
     constructor() {
         this.map = L.map('map', {
-            center: [22.3193, 114.1694],
+            center: [22.3193, 114.1694], // 香港中环
             zoom: 11,
             zoomControl: true,
-            attributionControl: true,
-            zoomSnap: 0.1,
-            zoomDelta: 0.5,
-            wheelPxPerZoomLevel: 80,
-            wheelDebounceTime: 40,
-            renderer: L.svg()
+            preferCanvas: true
         });
-        
-        this.currentProviderIndex = 0;
-        this.mapLayer = null;
-        this.errorCount = 0;
-        this.maxErrorsBeforeSwitch = 1;
         this.markers = [];
-        this.customIcon = this.createCustomIcon();
+        this.routePaths = new Map(); // 存储路径线路
+        this.startEndMarkers = new Map(); // 存储起点终点标记
+        
+        // 初始化地图瓦片服务相关属性
+        this.currentProviderIndex = 0; // 瓦片服务索引
+        this.errorCount = 0; // 错误计数
+        this.mapLayer = null; // 当前地图瓦片层
+        this.isReady = false; // 地图是否就绪
+        this.customIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `
+                <div class="marker-pin">
+                    <i class="fas fa-hiking marker-icon" style="color: white; font-size: 14px;"></i>
+                </div>
+            `,
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
+        this.startIcon = L.divIcon({
+            className: 'start-end-marker start-marker',
+            html: `
+                <div class="marker-pin start-pin">
+                    <i class="fas fa-play marker-icon" style="color: white; font-size: 12px;"></i>
+                </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 25]
+        });
+        this.endIcon = L.divIcon({
+            className: 'start-end-marker end-marker',
+            html: `
+                <div class="marker-pin end-pin">
+                    <i class="fas fa-flag-checkered marker-icon" style="color: white; font-size: 12px;"></i>
+                </div>
+            `,
+            iconSize: [25, 25],
+            iconAnchor: [12, 25]
+        });
         this.isRendering = false;
         this.renderQueue = [];
         this.progressiveLayers = new Map();
+        this.routePaths = new Map(); // 存储路径线路
+        this.showRoutes = true; // 是否显示路径
         this.setupPerformanceOptimizations();
     }
+
+
 
     createCustomIcon() {
         return L.icon({
             iconUrl: 'data:image/svg+xml;base64,' + btoa(`
                 <svg width="28" height="44" viewBox="0 0 28 44" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M14 0C6.3 0 0 6.3 0 14c0 14 14 30 14 30S28 28 28 14C28 6.3 21.7 0 14 0z" fill="#10B981"/>
+                    <path d="M14 0C6.3 0 0 6.3 0 14c0 14 14 30 14 30S28 28 28 14C28 6.3 21.7 0 14 0z" fill="#0078A8"/>
                     <circle cx="14" cy="14" r="8" fill="white"/>
-                    <circle cx="14" cy="14" r="5" fill="#10B981"/>
+                    <circle cx="14" cy="14" r="5" fill="#0078A8"/>
                     <path d="M14 6a8 8 0 1 1 0 16A8 8 0 0 1 14 6z" fill="white" opacity="0.2"/>
                 </svg>
             `),
@@ -626,25 +651,281 @@ class MapManager {
     }
 
     loadTileProvider() {
+        console.log('开始加载地图瓦片服务...');
+        
         if (this.currentProviderIndex >= TileProviders.length) {
             console.error('所有地图瓦片服务均无法加载');
+            this.showFallbackMap();
             return;
         }
 
+        // 清理现有的瓦片层
         if (this.mapLayer && this.map.hasLayer(this.mapLayer)) {
             this.map.removeLayer(this.mapLayer);
+            this.mapLayer = null;
         }
 
         this.errorCount = 0;
         const provider = TileProviders[this.currentProviderIndex];
-        console.log(`正在加载瓦片服务 ${this.currentProviderIndex + 1}: ${provider.url}`);
+        console.log(`正在加载瓦片服务 ${this.currentProviderIndex + 1}/${TileProviders.length}: ${provider.url}`);
         
-        this.mapLayer = L.tileLayer(provider.url, {
-            attribution: provider.attribution,
-            maxZoom: 19
-        }).addTo(this.map);
+        // 检查是否为离线模式或本地开发模式 - 优先处理
+        if (provider.isOffline || provider.isLocalDev) {
+            console.log(`检测到${provider.isOffline ? '离线' : '本地开发'}模式，立即使用备用地图方案`);
+            this.showFallbackMap();
+            return;
+        }
+        
+        // 创建瓦片图层，添加更详细的错误处理
+        try {
+            this.mapLayer = L.tileLayer(provider.url, {
+                attribution: provider.attribution,
+                maxZoom: provider.maxZoom || 19,
+                crossOrigin: false, // 改为false避免CORS问题
+                errorTileUrl: this.generateFallbackTile(),
+                detectRetina: false, // 禁用retina检测减少加载量
+                updateWhenIdle: true, // 空闲时更新提高性能
+                keepBuffer: 2 // 减少缓冲瓦片数量
+            });
 
-        this.setupErrorHandling();
+            // 添加加载完成监听器
+            this.mapLayer.once('load', () => {
+                console.log(`瓦片服务 ${this.currentProviderIndex + 1} 加载成功`);
+                this.onTileProviderReady();
+            });
+
+            // 添加错误监听器
+            this.mapLayer.once('tileerror', (e) => {
+                console.warn(`瓦片服务 ${this.currentProviderIndex + 1} 出现错误:`, e);
+                this.handleTileProviderError();
+            });
+
+            this.mapLayer.addTo(this.map);
+            console.log(`瓦片图层已添加到地图`);
+            
+        } catch (error) {
+            console.error(`创建瓦片图层时出错:`, error);
+            this.handleTileProviderError();
+        }
+    }
+
+    onTileProviderReady() {
+        console.log('地图瓦片服务已就绪');
+        this.isReady = true;
+    }
+
+    handleTileProviderError() {
+        console.warn(`瓦片服务 ${this.currentProviderIndex + 1} 出现错误 (错误计数: ${this.errorCount + 1})`);
+        this.errorCount++;
+        
+        // 如果第一个服务（离线模式）失败，立即尝试下一个
+        if (this.currentProviderIndex === 0) {
+            console.log('离线模式失败，尝试本地开发模式');
+            this.currentProviderIndex = 1;
+            setTimeout(() => {
+                this.loadTileProvider();
+            }, 500);
+            return;
+        }
+        
+        // 如果所有服务都失败，显示备用地图
+        if (this.currentProviderIndex >= TileProviders.length - 1) {
+            console.warn('所有瓦片服务均不可用，显示备用地图');
+            this.showFallbackMap();
+            return;
+        }
+        
+        // 切换到下一个服务
+        setTimeout(() => {
+            this.switchToNextProvider();
+        }, 2000); // 增加到2秒后切换，给网络更多时间
+    }
+
+    showFallbackMap() {
+        // 清除现有的瓦片层
+        if (this.mapLayer && this.map.hasLayer(this.mapLayer)) {
+            this.map.removeLayer(this.mapLayer);
+        }
+
+        console.log('显示备用地图方案');
+        
+        // 创建一个更实用的香港地图背景
+        const fallbackLayer = L.gridLayer({
+            tileSize: 256,
+            updateWhenIdle: true
+        });
+
+        fallbackLayer.createTile = (coords) => {
+            const tile = L.DomUtil.create('div', 'leaflet-tile');
+            
+            // 根据缩放级别和坐标创建不同的地图样式
+            const zoom = coords.z;
+            
+            if (zoom <= 6) {
+                // 低缩放级别：显示大陆概览
+                tile.style.backgroundColor = '#f0f8ff';
+                tile.style.backgroundImage = 'linear-gradient(45deg, #e6f3ff 25%, transparent 25%), linear-gradient(-45deg, #e6f3ff 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e6f3ff 75%), linear-gradient(-45deg, transparent 75%, #e6f3ff 75%)';
+                tile.style.backgroundSize = '20px 20px';
+                tile.style.backgroundPosition = '0 0, 0 10px, 10px -10px, -10px 0px';
+            } else if (zoom <= 10) {
+                // 中等缩放级别：香港区域
+                tile.style.backgroundColor = '#e8f5e8';
+                tile.style.border = '2px solid #0078A8';
+            } else {
+                // 高缩放级别：详细视图
+                tile.style.backgroundColor = '#f5f5dc';
+                tile.style.border = '1px solid #ddd';
+            }
+            
+            // 添加网格线和标记
+            tile.style.position = 'relative';
+            tile.style.display = 'flex';
+            tile.style.alignItems = 'center';
+            tile.style.justifyContent = 'center';
+            
+            // 在瓦片中心添加小点表示位置
+            const centerDot = L.DomUtil.create('div', 'fallback-tile-dot');
+            centerDot.style.cssText = `
+                position: absolute;
+                width: 4px;
+                height: 4px;
+                background-color: #0078A8;
+                border-radius: 50%;
+                border: 1px solid white;
+            `;
+            tile.appendChild(centerDot);
+            
+            return tile;
+        };
+
+        fallbackLayer.addTo(this.map);
+        this.mapLayer = fallbackLayer;
+        
+        // 添加香港主要地点标记（即使在离线模式下也能显示重要位置）
+        this.addOfflineMarkers();
+        
+        // 显示友好的通知给用户
+        this.showNotification('正在使用离线地图模式。所有功能正常，但部分详细信息可能不完整。', 'info');
+    }
+
+    generateFallbackTile() {
+        // 返回一个简单的占位符图片（base64编码的1x1像素透明图片）
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==';
+    }
+
+    showNotification(message, type = 'info') {
+        // 创建简单的通知元素
+        const notification = document.createElement('div');
+        notification.className = `map-notification map-notification--${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="notification-icon ${this.getNotificationIcon(type)}"></i>
+                <div class="notification-text">
+                    <div class="notification-title">${this.getNotificationTitle(type)}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+        
+        // 添加样式
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${this.getNotificationBg(type)};
+            color: ${this.getNotificationColor(type)};
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease-out;
+            font-family: var(--font-primary, sans-serif);
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // 3秒后自动移除
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.style.animation = 'slideOutRight 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }
+        }, 5000);
+    }
+
+    getNotificationIcon(type) {
+        const icons = {
+            'info': 'fas fa-info-circle',
+            'warning': 'fas fa-exclamation-triangle', 
+            'error': 'fas fa-times-circle',
+            'success': 'fas fa-check-circle'
+        };
+        return icons[type] || icons['info'];
+    }
+
+    getNotificationTitle(type) {
+        const titles = {
+            'info': '信息',
+            'warning': '警告',
+            'error': '错误', 
+            'success': '成功'
+        };
+        return titles[type] || titles['info'];
+    }
+
+    getNotificationBg(type) {
+        const backgrounds = {
+            'info': '#E3F2FD',
+            'warning': '#FFF3E0',
+            'error': '#FFEBEE',
+            'success': '#E8F5E8'
+        };
+        return backgrounds[type] || backgrounds['info'];
+    }
+
+    getNotificationColor(type) {
+        const colors = {
+            'info': '#1976D2',
+            'warning': '#F57C00',
+            'error': '#D32F2F',
+            'success': '#388E3C'
+        };
+        return colors[type] || colors['info'];
+    }
+    
+    addOfflineMarkers() {
+        // 香港重要地点的离线标记
+        const hkLandmarks = [
+            { name: '维多利亚港', coords: [22.3193, 114.1694], type: 'harbor' },
+            { name: '太平山顶', coords: [22.2711, 114.1492], type: 'peak' },
+            { name: '香港国际机场', coords: [22.3080, 113.9150], type: 'airport' },
+            { name: '中环', coords: [22.2816, 114.1583], type: 'business' },
+            { name: '尖沙咀', coords: [22.2974, 114.1722], type: 'tourist' }
+        ];
+        
+        hkLandmarks.forEach(landmark => {
+            const icon = L.divIcon({
+                className: 'offline-marker',
+                html: `<div class="offline-marker-${landmark.type}">${this.getOfflineMarkerIcon(landmark.type)}</div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 20]
+            });
+            
+            const marker = L.marker(landmark.coords, { icon }).addTo(this.map);
+            marker.bindPopup(`<strong>${landmark.name}</strong><br><em>离线模式标记</em>`);
+        });
+    }
+    
+    getOfflineMarkerIcon(type) {
+        const icons = {
+            'harbor': '⚓',
+            'peak': '⛰️',
+            'airport': '✈️',
+            'business': '🏢',
+            'tourist': '🗼'
+        };
+        return icons[type] || '📍';
     }
 
     setupPerformanceOptimizations() {
@@ -780,7 +1061,7 @@ class MapManager {
             const simpleIcon = L.icon({
                 iconUrl: 'data:image/svg+xml;base64,' + btoa(`
                     <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="10" cy="10" r="8" fill="#10B981" stroke="white" stroke-width="2"/>
+                        <circle cx="10" cy="10" r="8" fill="#0078A8" stroke="white" stroke-width="2"/>
                     </svg>
                 `),
                 iconSize: [20, 20],
@@ -842,26 +1123,76 @@ class MapManager {
     }
 
     setupErrorHandling() {
-        this.mapLayer.off('tileerror');
+        // 移除之前的错误监听器
+        if (this.mapLayer) {
+            this.mapLayer.off('tileerror');
+            this.mapLayer.off('tileload');
+        }
+
+        // 设置瓦片错误处理
         this.mapLayer.on('tileerror', (e) => {
-            this.errorCount++;
-            console.log(`瓦片加载错误 (${this.errorCount}/${this.maxErrorsBeforeSwitch}):`, e.tile.src);
+            const errorUrl = e.tile.src;
+            console.warn(`瓦片加载失败: ${errorUrl}`);
             
-            if (this.errorCount >= this.maxErrorsBeforeSwitch) {
-                this.currentProviderIndex = (this.currentProviderIndex + 1) % TileProviders.length;
-                console.log(`切换到下一个瓦片服务: ${TileProviders[this.currentProviderIndex].url}`);
-                this.errorCount = 0;
-                this.loadTileProvider();
+            // 避免重复计算同一URL的错误
+            if (this.temporaryErrors.has(errorUrl)) {
+                return;
             }
+            
+            this.temporaryErrors.add(errorUrl);
+            this.errorCount++;
+            
+            // 根据提供商的错误容忍度决定是否切换
+            const currentProvider = TileProviders[this.currentProviderIndex];
+            const errorTolerance = currentProvider.errorTolerance || 0;
+            
+            // 改进的切换逻辑：达到错误容忍度且超过最小错误数才切换
+            if (this.errorCount > errorTolerance && this.errorCount >= this.maxErrorsBeforeSwitch) {
+                console.log(`达到错误阈值（${this.errorCount}/${this.maxErrorsBeforeSwitch}），切换到下一个瓦片服务`);
+                this.switchToNextProvider();
+            }
+            
+            // 清理临时错误记录
+            setTimeout(() => {
+                this.temporaryErrors.delete(errorUrl);
+            }, 10000);
         });
 
         this.mapLayer.off('tileload');
-        this.mapLayer.on('tileload', () => {
+        this.mapLayer.on('tileload', (e) => {
             if (this.errorCount > 0) {
                 console.log('瓦片成功加载，重置错误计数');
                 this.errorCount = 0;
+                this.temporaryErrors.clear();
             }
+            
+            this.trackTileLoadProgress();
         });
+    }
+    
+    switchToNextProvider() {
+        const previousProvider = TileProviders[this.currentProviderIndex];
+        this.currentProviderIndex = (this.currentProviderIndex + 1) % TileProviders.length;
+        const newProvider = TileProviders[this.currentProviderIndex];
+        
+        console.log(`切换瓦片服务: ${previousProvider.url} -> ${newProvider.url}`);
+        this.errorCount = 0;
+        this.temporaryErrors.clear();
+        this.loadTileProvider();
+    }
+    
+    trackTileLoadProgress() {
+        // 简单的进度跟踪 - 实际项目中可以使用更复杂的统计
+        if (this.mapLayer && this.mapLayer._tiles) {
+            const loadedTiles = Object.keys(this.mapLayer._tiles).length;
+            const totalTiles = this.mapLayer._tileZoom !== undefined ? 
+                Math.pow(2, this.mapLayer._tileZoom) : 0;
+            
+            // 发送统计信息（可以用于性能监控）
+            if (loadedTiles % 10 === 0) { // 每10个瓦片报告一次
+                console.log(`地图加载进度: ${loadedTiles} 瓦片已加载`);
+            }
+        }
     }
 
     addRouteMarkers() {
@@ -872,17 +1203,78 @@ class MapManager {
         });
         this.markers = [];
 
+        // 清理现有的路径线
+        this.routePaths.forEach((polyline, routeId) => {
+            if (this.map.hasLayer(polyline)) {
+                this.map.removeLayer(polyline);
+            }
+        });
+        this.routePaths.clear();
+
+        // 清理现有的起点终点标记
+        this.startEndMarkers.forEach((markers, routeId) => {
+            markers.forEach(marker => {
+                if (this.map.hasLayer(marker)) {
+                    this.map.removeLayer(marker);
+                }
+            });
+        });
+        this.startEndMarkers.clear();
+
         AppState.filteredRoutes.forEach(route => {
             const marker = L.marker(route.coordinates, { icon: this.customIcon }).addTo(this.map);
             this.markers.push(marker);
             
+            // 添加路径线（如果路线有routePath数据）
+            if (route.routePath && Array.isArray(route.routePath) && route.routePath.length > 1) {
+                const pathOptions = {
+                    color: '#0078A8', // 维多利亚港蓝
+                    weight: 4,
+                    opacity: 0.7,
+                    smoothFactor: 1.0,
+                    dashArray: '5, 5' // 虚线效果
+                };
+                
+                const polyline = L.polyline(route.routePath, pathOptions).addTo(this.map);
+                this.routePaths.set(route.id, polyline);
+
+                // 添加起点和终点标记
+                if (route.routePath.length > 0) {
+                    const startPoint = route.routePath[0]; // 起点
+                    const endPoint = route.routePath[route.routePath.length - 1]; // 终点
+
+                    // 创建起点标记
+                    const startMarker = L.marker(startPoint, { icon: this.startIcon }).addTo(this.map);
+                    startMarker.bindPopup(`
+                        <div style="font-family: 'Noto Sans SC', sans-serif; padding: 4px 8px;">
+                            <strong style="color: #059669;">🚀 起点</strong><br>
+                            <span style="color: #6B7280; font-size: 12px;">${route.name}</span>
+                        </div>
+                    `);
+
+                    // 创建终点标记
+                    const endMarker = L.marker(endPoint, { icon: this.endIcon }).addTo(this.map);
+                    endMarker.bindPopup(`
+                        <div style="font-family: 'Noto Sans SC', sans-serif; padding: 4px 8px;">
+                            <strong style="color: #DC2626;">🏁 终点</strong><br>
+                            <span style="color: #6B7280; font-size: 12px;">${route.name}</span>
+                        </div>
+                    `);
+
+                    // 存储起点终点标记
+                    if (!this.startEndMarkers.has(route.id)) {
+                        this.startEndMarkers.set(route.id, []);
+                    }
+                    this.startEndMarkers.get(route.id).push(startMarker, endMarker);
+                }
+            }
             const difficulty = Utils.getDifficulty(route);
             const rating = Utils.generateRating();
             
             const popupContent = `
                 <div style="min-width: 300px; font-family: 'Noto Sans SC', sans-serif; padding: 8px 0;">
-                    <div style="border-bottom: 3px solid #10B981; padding-bottom: 10px; margin-bottom: 14px;">
-                        <h3 style="color: #10B981; margin: 0 0 6px 0; font-size: 20px; font-weight: 700; line-height: 1.3;">${route.name}</h3>
+                    <div style="border-bottom: 3px solid #0078A8; padding-bottom: 10px; margin-bottom: 14px;">
+                        <h3 style="color: #0078A8; margin: 0 0 6px 0; font-size: 20px; font-weight: 700; line-height: 1.3;">${route.name}</h3>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                             <div style="color: #64748B; font-size: 13px; font-weight: 500;">难度: <span style="color: ${difficulty.color}; font-weight: 600;">${difficulty.level}</span></div>
                             <div style="color: #F59E0B; font-size: 16px; letter-spacing: 1px;">
@@ -894,6 +1286,24 @@ class MapManager {
                         <strong style="color: #374151; font-size: 14px;">📍 位置:</strong> 
                         <span style="color: #4B5563; font-weight: 500;">${route.location}</span>
                     </div>
+                    ${route.distance ? `
+                    <div style="margin-bottom: 8px; line-height: 1.6;">
+                        <strong style="color: #374151; font-size: 14px;">📏 距离:</strong> 
+                        <span style="color: #4B5563; font-weight: 500;">${route.distance}</span>
+                    </div>
+                    ` : ''}
+                    ${route.duration ? `
+                    <div style="margin-bottom: 8px; line-height: 1.6;">
+                        <strong style="color: #374151; font-size: 14px;">⏱️ 预计时间:</strong> 
+                        <span style="color: #4B5563; font-weight: 500;">${route.duration}</span>
+                    </div>
+                    ` : ''}
+                    ${route.routePath ? `
+                    <div style="margin-bottom: 8px; line-height: 1.6;">
+                        <strong style="color: #374151; font-size: 14px;">🗺️ 路线信息:</strong> 
+                        <span style="color: #0078A8; font-weight: 500;">✓ 完整GPS路径已加载</span>
+                    </div>
+                    ` : ''}
                     <div style="color: #6B7280; font-size: 14px; line-height: 1.6;">
                         <strong style="color: #374151;">🌟 特色:</strong> 
                         <span style="display: block; margin-top: 4px; text-align: justify;">${Utils.truncateText(route.features, 150)}</span>
@@ -901,6 +1311,29 @@ class MapManager {
                 </div>
             `;
             marker.bindPopup(popupContent);
+            
+            // 添加悬停提示
+            const tooltipContent = `
+                <div style="min-width: 200px; font-family: 'Noto Sans SC', sans-serif; padding: 4px;">
+                    <h4 style="color: #0078A8; margin: 0 0 6px 0; font-size: 16px; font-weight: 600;">${route.name}</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="color: #64748B; font-size: 12px;">难度: <span style="color: ${difficulty.color}; font-weight: 500;">${difficulty.level}</span></span>
+                        <span style="color: #F59E0B; font-size: 14px;">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>
+                    </div>
+                    <div style="color: #6B7280; font-size: 12px; line-height: 1.4;">
+                        📍 ${route.location}
+                    </div>
+                </div>
+            `;
+            marker.bindTooltip(tooltipContent, {
+                permanent: false,
+                direction: 'top',
+                offset: [0, -10],
+                className: 'custom-tooltip',
+                opacity: 0.9,
+                closeButton: false
+            });
+            
             AppState.markers.set(route.id, marker);
         });
     }
@@ -1004,29 +1437,55 @@ class RouteManager {
         AppState.activeRoute = routeId;
         this.incrementViewCount();
 
-        // 打开路线详情弹窗
-        if (this.routeDetailManager) {
-            this.routeDetailManager.showRouteDetail(route);
-        }
-
         // 移动地图视图
         DOM.mapManager.map.setView(route.coordinates, 14, {
             animate: true,
             duration: 1
         });
 
-        // 打开弹出窗口
+        // 高亮显示对应的标记和路径
         const marker = AppState.markers.get(routeId);
+        const polyline = DOM.mapManager.routePaths.get(routeId);
+        
         if (marker) {
+            // 可选：短暂打开popup以确认定位
             setTimeout(() => {
                 marker.openPopup();
-            }, 800);
+            }, 500);
+            setTimeout(() => {
+                marker.closePopup();
+            }, 3000);
+        }
+        
+        // 高亮显示对应路径
+        if (polyline) {
+            // 重置所有路径样式
+            DOM.mapManager.routePaths.forEach((pl, id) => {
+                if (id !== routeId) {
+                    pl.setStyle({
+                        color: '#0078A8', // 维多利亚港蓝
+                        weight: 4,
+                        opacity: 0.7,
+                        dashArray: '5, 5'
+                    });
+                }
+            });
+            
+            // 高亮选中路径 - 香港传统红色
+            polyline.setStyle({
+                color: '#C8102E',
+                weight: 6,
+                opacity: 1.0,
+                dashArray: null
+            });
+            
+            // 将路径置于最上层
+            polyline.bringToFront();
         }
     }
 
     incrementViewCount() {
         AppState.totalViews++;
-        DOM.totalViews.textContent = AppState.totalViews;
         
         // 保存到localStorage
         localStorage.setItem('hiking-app-views', AppState.totalViews.toString());
@@ -1079,14 +1538,13 @@ class HikingApp {
     initDOM() {
         DOM.map = document.getElementById('map');
         DOM.sidebar = document.getElementById('sidebar');
-        DOM.mobileToggle = document.getElementById('mobileToggle');
         DOM.sidebarOverlay = document.getElementById('sidebarOverlay');
         DOM.searchInput = document.getElementById('searchInput');
         DOM.filterTags = document.getElementById('filterTags');
         DOM.routesList = document.getElementById('routesList');
         DOM.loadingState = document.getElementById('loadingState');
         DOM.emptyState = document.getElementById('emptyState');
-        DOM.totalRoutes = document.getElementById('totalRoutes');
+
         DOM.totalViews = document.getElementById('totalViews');
         
         // 初始化新增DOM元素
@@ -1114,7 +1572,7 @@ class HikingApp {
 
     loadStoredData() {
         const storedViews = localStorage.getItem('hiking-app-views');
-        if (storedViews) {
+        if (storedViews && DOM.totalViews) {
             AppState.totalViews = parseInt(storedViews);
             DOM.totalViews.textContent = AppState.totalViews;
         }
@@ -1169,11 +1627,7 @@ class HikingApp {
             }
         });
 
-        // 移动端切换
-        DOM.mobileToggle.addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-
+        // 侧边栏遮罩点击事件
         DOM.sidebarOverlay.addEventListener('click', () => {
             this.closeSidebar();
         });
@@ -1232,9 +1686,20 @@ class HikingApp {
 
         searchStats.innerHTML = statsHTML;
         
+        // 确保立即显示
+        if (filteredRoutes !== totalRoutes || currentFilter !== 'all' || searchQuery) {
+            searchStats.style.display = 'flex';
+        } else {
+            searchStats.style.display = 'none';
+        }
+        
         // 显示动画
         requestAnimationFrame(() => {
-            searchStats.classList.add('visible');
+            if (searchStats.style.display !== 'none') {
+                searchStats.classList.add('visible');
+            } else {
+                searchStats.classList.remove('visible');
+            }
         });
     }
 
@@ -1297,7 +1762,7 @@ class HikingApp {
         AppState.routes = Utils.generateMockRoutes();
         AppState.filteredRoutes = [...AppState.routes];
         
-        DOM.totalRoutes.textContent = AppState.routes.length;
+
         
         // 初始化地图
         this.mapManager = new MapManager();
@@ -1316,28 +1781,19 @@ class HikingApp {
         this.routeManager.applyFilters();
     }
 
-    toggleSidebar() {
-        if (window.innerWidth <= 768) {
-            DOM.sidebar.classList.toggle('mobile-closed');
-            DOM.sidebarOverlay.classList.toggle('active');
-            DOM.mobileToggle.innerHTML = DOM.sidebar.classList.contains('mobile-closed') ? 
-                '<i class="fas fa-bars"></i>' : '<i class="fas fa-times"></i>';
-        }
-    }
-
     closeSidebar() {
+        // 侧边栏在非移动端一直显示，无需关闭
         if (window.innerWidth <= 768) {
             DOM.sidebar.classList.add('mobile-closed');
             DOM.sidebarOverlay.classList.remove('active');
-            DOM.mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
         }
     }
 
     handleResize() {
+        // 非移动端侧边栏保持显示，移动端不处理
         if (window.innerWidth > 768) {
             DOM.sidebar.classList.remove('mobile-closed');
             DOM.sidebarOverlay.classList.remove('active');
-            DOM.mobileToggle.innerHTML = '<i class="fas fa-bars"></i>';
         }
     }
 }

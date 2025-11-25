@@ -1,0 +1,38 @@
+{
+  "name": "hiking--hong-kong",
+  "version": "1.0.0",
+  "description": "一个现代化的香港远足路线搜索和筛选Web应用，提供直观的用户界面和流畅的交互体验。",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aramisjiang-wq/hiking-hong-kong.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/aramisjiang-wq/hiking-hong-kong/issues"
+  },
+  "homepage": "https://github.com/aramisjiang-wq/hiking-hong-kong#readme",
+  "devDependencies": {
+    "vite": "^7.2.4"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4"
+  }
+}
